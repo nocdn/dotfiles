@@ -1,0 +1,31 @@
+2024-09-04 08:37:56,567 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-09-04 08:37:56,569 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances']
+2024-09-04 08:37:56,576 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances', 'list']
+2024-09-04 08:37:56,578 DEBUG    root            Running [gcloud.compute.instances.list] with arguments: [--filter: "status=RUNNING", --format: "table[no-heading](name, zone)"]
+2024-09-04 08:37:56,685 INFO     root            client_filter=None server_filter='status eq RUNNING'
+2024-09-04 08:37:56,686 DEBUG    root            Chosen display Format:    table(
+      name,
+      zone.basename(),
+      machineType.machine_type().basename(),
+      scheduling.preemptible.yesno(yes=true, no=''),
+      networkInterfaces[].networkIP.notnull().list():label=INTERNAL_IP,
+      networkInterfaces[].accessConfigs[0].natIP.notnull().list()      :label=EXTERNAL_IP,
+      status
+    ) table[no-heading](name, zone)
+2024-09-04 08:37:56,687 INFO     root            Display format: "    table(
+      name,
+      zone.basename(),
+      machineType.machine_type().basename(),
+      scheduling.preemptible.yesno(yes=true, no=''),
+      networkInterfaces[].networkIP.notnull().list():label=INTERNAL_IP,
+      networkInterfaces[].accessConfigs[0].natIP.notnull().list()      :label=EXTERNAL_IP,
+      status
+    ) table[no-heading](name, zone)"
+2024-09-04 08:37:56,696 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-09-04 08:37:57,558 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/aggregated/instances?alt=json&includeAllScopes=True&maxResults=500&returnPartialSuccess=True HTTP/1.1" 200 None
+2024-09-04 08:37:57,596 INFO     ___FILE_ONLY___ cheaper-server
+2024-09-04 08:37:57,596 INFO     ___FILE_ONLY___   
+2024-09-04 08:37:57,596 INFO     ___FILE_ONLY___ europe-west9-a
+2024-09-04 08:37:57,596 INFO     ___FILE_ONLY___ 
+
+2024-09-04 08:37:57,607 DEBUG    root            Metrics reporting process started...

@@ -1,0 +1,14 @@
+2024-09-04 08:37:58,154 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-09-04 08:37:58,156 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances']
+2024-09-04 08:37:58,162 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances', 'stop']
+2024-09-04 08:37:58,163 DEBUG    root            Running [gcloud.compute.instances.stop] with arguments: [--zone: "europe-west9-a", INSTANCE_NAMES:1: "['cheaper-server']"]
+2024-09-04 08:37:58,272 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-09-04 08:37:58,966 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/zones/europe-west9-a/instances/cheaper-server/stop?alt=json HTTP/1.1" 200 None
+2024-09-04 08:37:58,976 INFO     ___FILE_ONLY___ Stopping instance(s) cheaper-server...
+2024-09-04 08:37:59,988 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-09-04 08:38:44,540 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/zones/europe-west9-a/operations/operation-1725435478792-6214640cbd861-51ad8f24-14c7c567/wait?alt=json HTTP/1.1" 200 None
+2024-09-04 08:38:44,619 INFO     ___FILE_ONLY___ Updated [https://compute.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west9-a/instances/cheaper-server].
+
+2024-09-04 08:38:44,620 DEBUG    root            Chosen display Format:none
+2024-09-04 08:38:44,621 INFO     root            Display format: "none"
+2024-09-04 08:38:44,641 DEBUG    root            Metrics reporting process started...
