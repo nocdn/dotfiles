@@ -329,7 +329,7 @@ function convert_to_iso8601_llm() {
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $OPENAI_API_KEY" \
     -d "{
-      \"model\": \"gpt-4o-mini\",
+      \"model\": \"gpt-4o-2024-08-06\",
       \"messages\": [
         {
           \"role\": \"system\",
@@ -1021,3 +1021,11 @@ source ~/.zsh_secrets
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="/Users/bartek/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
