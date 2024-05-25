@@ -140,16 +140,6 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-export OPENAI_API_KEY=sk-proj-VeISYv7YFEsAzvNhaQ2TT3BlbkFJACrbPEyftCDoAXp1d1nX
-export OPENROUTER_API_KEY=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
-export FIREWORKS_API_KEY=YRqCJ77HbMkgVsArvHqD2G6nyqoJFqDlq640lXSFtN8SvcKG
-export PPLX_API_KEY=pplx-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
-export GROQ_API_KEY=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
-export MISTRAL_API_KEY=cgmiDdbUG1PNl1YF2nr0UrdDacZg2YAV
-export DEEPSEEK_API_KEY=sk-fc598b820bba45d48968591ccc00764a
-export TOGETHERAI_API_KEY=cf2be16d4bcc109c94d53eb228a7033bbd62861239b1ce57e55993756ca82c38
-export LLAMA_CLOUD_API_KEY=llx-rCJtFrQd3ehoc7ofjFwAefQ1KQU7JpDQ5MBxCP7U3fHhYCim
-
 alias runtokenizer='/Users/bartek/Scripts/Tokenizer/run_tokenizer.sh'
 alias runwebdev='/Users/bartek/Scripts/Open-Web-Dev-Testing/openWebDevTest.sh'
 alias runcopilot='/Users/bartek/Scripts/Text-Copilot/runTextCopilot.sh'
