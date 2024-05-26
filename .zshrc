@@ -1,5 +1,5 @@
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME=""
+ZSH_THEME="minimal"
 plugins=(git)
 source $ZSH/oh-my-zsh.sh
 
@@ -57,7 +57,7 @@ alias act='source bin/activate'
 alias nq='networkQuality'
 alias zshconfig="code ~/.zshrc"
 alias reload="source ~/.zshrc"
-alias ls="ls -lah --color=always"
+alias la="eza -l --no-permissions --no-user"
 alias gs='git status'
 alias ga='git add'
 alias gp='git push'
@@ -65,6 +65,9 @@ alias gc='git commit'
 alias cp='cp -iv'
 alias mv='mv -iv'
 alias rm='rm -iv'
+alias cl='clear'
+
+EZA_COLORS="di=34:ex=32:fi=0:sn=0:da=0"
 
 function listinstances() {
     gcloud compute instances list --format="table[no-heading](name, networkInterfaces[0].accessConfigs[0].natIP:label=EXTERNAL_IP)"

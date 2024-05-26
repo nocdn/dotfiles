@@ -12,6 +12,8 @@ brew "python@3.12"
 brew "glib"
 # Run arbitrary commands when files change
 brew "entr"
+# Modern, maintained replacement for ls
+brew "eza"
 # GNU Transport Layer Security (TLS) Library
 brew "gnutls"
 # OpenType text shaping engine
@@ -121,4 +123,5 @@ vscode "supermaven.supermaven"
 vscode "tyriar.vscode-terminal-here"
 vscode "vadimcn.vscode-lldb"
 vscode "vknabel.vscode-apple-swift-format"
+vscode "whetstonetechnologiesinc.speechmarkdown-vscode"
 vscode "yzhang.markdown-all-in-one"
