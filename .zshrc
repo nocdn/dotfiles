@@ -66,6 +66,7 @@ alias cp='cp -iv'
 alias mv='mv -iv'
 alias rm='rm -iv'
 alias cl='clear'
+alias ipinfo='curl -s http://ip-api.com/json/ | jq "."'
 
 EZA_COLORS="di=34:ex=32:fi=0:sn=0:da=0"
 
