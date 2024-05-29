@@ -57,7 +57,7 @@ alias act='source bin/activate'
 alias nq='networkQuality'
 alias zshconfig="code ~/.zshrc"
 alias reload="source ~/.zshrc"
-alias la="eza -l --no-permissions --no-user"
+alias la="eza -l --no-permissions --no-user -a"
 alias gs='git status'
 alias ga='git add'
 alias gp='git push'
@@ -222,4 +222,11 @@ function deleteinstance() {
     gcloud compute instances delete "$instance_name"
 }
 
-eval "$(zoxide init --cmd cd zsh)"
+function dlyt() {
+    # use the first argument as the url
+    local url=$1
+
+    yt-dlp "$url" -f "bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --output "%(title)s.%(ext)s"
+}
+
+eval "$(zoxide init --cmd cd zsh)"if 
