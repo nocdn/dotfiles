@@ -1,23 +1,5 @@
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME=""
-plugins=(git)
-source $ZSH/oh-my-zsh.sh
-
-
-
-export ZPLUG_HOME=/opt/homebrew/opt/zplug
-source $ZPLUG_HOME/init.zsh
-
-zplug "mafredri/zsh-async", from:github
-zplug "zsh-users/zsh-autosuggestions", from:github
-zplug load
-
-if ! zplug check --verbose; then
-    printf "Install? [y/N]: "
-    if read -q; then
-        echo; zplug install
-    fi
-fi
+# zsh Autosuggestions plugin manual installation
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 
 # history options
@@ -31,45 +13,72 @@ setopt hist_ignore_all_dups
 setopt hist_ignore_dups
 setopt hist_find_no_dups
 
-# completion styling
+# completion styling to help with zeoxide
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 zstyle ':completion:*' menu no
 
 
-
-
+# node and npm initialization
 eval "$(/opt/homebrew/bin/brew shellenv)"
 export PATH=/opt/homebrew/bin:$PATH
 export PATH="/usr/local/bin:$PATH"
 export PATH=~/.npm-global/bin:$PATH
 export PATH="/Users/bartek/.local/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-alias runtokenizer='/Users/bartek/Scripts/Tokenizer/run_tokenizer.sh'
+# from https://peterlyons.com/problog/2018/01/zsh-lazy-loading/ 
+# placeholder nvm shell function
+# On first use, it will set nvm up properly which will replace the `nvm`
+# shell function with the real one
+nvm() {
+  if [[ -d '/usr/local/opt/nvm' ]]; then
+    NVM_DIR="/usr/local/opt/nvm"
+    export NVM_DIR
+    # shellcheck disable=SC1090
+    source "${NVM_DIR}/nvm.sh"
+    if [[ -e ~/.nvm/alias/default ]]; then
+      PATH="${PATH}:${HOME}.nvm/versions/node/$(cat ~/.nvm/alias/default)/bin"
+    fi
+    # invoke the real nvm function now
+    nvm "$@"
+  else
+    echo "nvm is not installed" >&2
+    return 1
+  fi
+}
+
+
+
+# personal aliases
 alias runwebdev='/Users/bartek/Scripts/Open-Web-Dev-Testing/openWebDevTest.sh'
 alias runcopilot='/Users/bartek/Scripts/Text-Copilot/runTextCopilot.sh'
 alias runpythondev='source /Users/bartek/Scripts/Python-Testing-Env/openPythonTest.sh'
 alias runcopilot='source /Users/bartek/Scripts/Typing-Copilot/runTypingCopilot.sh'
-alias runwhisper='source /Users/bartek/Scripts/Transcription/runTranscription.sh'
 alias act='source bin/activate'
 alias nq='networkQuality'
 alias zshconfig="code ~/.zshrc"
 alias reload="source ~/.zshrc"
-alias la="eza -l --no-permissions --no-user -a"
+alias la="eza -l --no-permissions --no-user -a --group-directories-first"
 alias gs='git status'
 alias ga='git add'
 alias gp='git push'
 alias gc='git commit'
 alias cp='cp -iv'
 alias mv='mv -iv'
-alias rm='rm -iv'
 alias cl='clear'
 alias ipinfo='curl -s http://ip-api.com/json/ | jq "."'
 
-EZA_COLORS="di=34:ex=32:fi=0:sn=0:da=0"
 
+# EZA_COLORS="di=34:ex=32:fi=0:sn=0:da=32"
+EXA_COLORS="reset"
+
+
+# Bind keys for history search (eg. only show matches from the current line)
+autoload -Uz compinit && compinit
+bindkey "^[[A" history-search-backward
+bindkey "^[[B" history-search-forward
+
+# personal functions
 function listinstances() {
     gcloud compute instances list --format="table[no-heading](name, networkInterfaces[0].accessConfigs[0].natIP:label=EXTERNAL_IP)"
 }
@@ -229,4 +238,18 @@ function dlyt() {
     yt-dlp "$url" -f "bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --output "%(title)s.%(ext)s"
 }
 
+
+# zeoxide initialization and iterm2 integration
 eval "$(zoxide init --cmd cd zsh)"if 
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+export OPENAI_API_KEY=sk-proj-VeISYv7YFEsAzvNhaQ2TT3BlbkFJACrbPEyftCDoAXp1d1nX
+export OPENROUTER_API_KEY=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
+export FIREWORKS_API_KEY=YRqCJ77HbMkgVsArvHqD2G6nyqoJFqDlq640lXSFtN8SvcKG
+export PPLX_API_KEY=pplx-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
+export GROQ_API_KEY=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
+export MISTRAL_API_KEY=cgmiDdbUG1PNl1YF2nr0UrdDacZg2YAV
+export DEEPSEEK_API_KEY=sk-fc598b820bba45d48968591ccc00764a
+export TOGETHERAI_API_KEY=cf2be16d4bcc109c94d53eb228a7033bbd62861239b1ce57e55993756ca82c38
+export LLAMA_CLOUD_API_KEY=llx-rCJtFrQd3ehoc7ofjFwAefQ1KQU7JpDQ5MBxCP7U3fHhYCim
+export GEMINI_API_KEY=AIzaSyDhIwZkaJ0niXxSCftwewM__Bh1UDHFuv
