@@ -60,7 +60,7 @@ alias act='source bin/activate'
 alias nq='networkQuality'
 alias zshconfig="code ~/.zshrc"
 alias reload="source ~/.zshrc"
-alias la="eza -l --no-permissions --no-user -a --group-directories-first"
+alias la="eza -l --no-permissions --no-user -a"
 alias gs='git status'
 alias ga='git add'
 alias gp='git push'
@@ -71,8 +71,19 @@ alias cl='clear'
 alias ipinfo='curl -s http://ip-api.com/json/ | jq "."'
 
 
-# EZA_COLORS="di=34:ex=32:fi=0:sn=0:da=32"
-EXA_COLORS="reset"
+# dir color meanings
+# da = date and time
+# di = directory
+# ex = executable
+# fi = file
+# sn = size
+
+
+# export EZA_COLORS="di=34:ex=32:fi=0:sn=0:da=32"
+# export EXA_COLORS="di=0;35:da=0;0:sn=0;0"
+
+export EXA_COLORS="da=0;0:sn=0;0"
+
 
 
 # Bind keys for history search (eg. only show matches from the current line)
