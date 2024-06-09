@@ -82,7 +82,8 @@ alias ipinfo='curl -s http://ip-api.com/json/ | jq "."'
 # export EZA_COLORS="di=34:ex=32:fi=0:sn=0:da=32"
 # export EXA_COLORS="di=0;35:da=0;0:sn=0;0"
 
-export EXA_COLORS="da=0;0:sn=0;0"
+# export EXA_COLORS="da=0;0:sn=0;0"
+export EXA_COLORS="di=38;5;117:ex=38;5;177:no=00:da=0;0:sn=0;0"
 
 
 
@@ -272,7 +273,7 @@ export GEMINI_API_KEY=AIzaSyDhIwZkaJ0niXxSCftwewM__Bh1UDHFuv
 
 # syntax highlighting
 
-source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
+source ~/.zsh/catppuccin_frappe-zsh-syntax-highlighting.zsh
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Amazon Q post block. Keep at the bottom of this file.
