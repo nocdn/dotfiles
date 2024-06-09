@@ -1,3 +1,5 @@
+# Amazon Q pre block. Keep at the top of this file.
+[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
 # zsh Autosuggestions plugin manual installation
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 
@@ -77,6 +79,9 @@ EXA_COLORS="reset"
 autoload -Uz compinit && compinit
 bindkey "^[[A" history-search-backward
 bindkey "^[[B" history-search-forward
+
+# Prompt customization
+PS1="%F{white}%n %F{#F38BA8}%~ %F{white}%# %F"
 
 # personal functions
 function listinstances() {
@@ -240,7 +245,7 @@ function dlyt() {
 
 
 # zeoxide initialization and iterm2 integration
-eval "$(zoxide init --cmd cd zsh)"if 
+eval "$(zoxide init --cmd cd zsh)"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 export OPENAI_API_KEY=sk-proj-VeISYv7YFEsAzvNhaQ2TT3BlbkFJACrbPEyftCDoAXp1d1nX
@@ -253,3 +258,11 @@ export DEEPSEEK_API_KEY=sk-fc598b820bba45d48968591ccc00764a
 export TOGETHERAI_API_KEY=cf2be16d4bcc109c94d53eb228a7033bbd62861239b1ce57e55993756ca82c38
 export LLAMA_CLOUD_API_KEY=llx-rCJtFrQd3ehoc7ofjFwAefQ1KQU7JpDQ5MBxCP7U3fHhYCim
 export GEMINI_API_KEY=AIzaSyDhIwZkaJ0niXxSCftwewM__Bh1UDHFuv
+
+# syntax highlighting
+
+source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# Amazon Q post block. Keep at the bottom of this file.
+[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
