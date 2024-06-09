@@ -60,7 +60,14 @@ alias act='source bin/activate'
 alias nq='networkQuality'
 alias zshconfig="code ~/.zshrc"
 alias reload="source ~/.zshrc"
-alias la="eza -l --no-permissions --no-user -a"
+
+la() {
+  if [ "$1" = "-a" ]; then
+    eza -la --no-permissions --no-user --no-filesize
+  else
+    eza -l --no-permissions --no-user --no-filesize "$@"
+  fi
+}
 alias gs='git status'
 alias ga='git add'
 alias gp='git push'
@@ -273,7 +280,7 @@ export GEMINI_API_KEY=AIzaSyDhIwZkaJ0niXxSCftwewM__Bh1UDHFuv
 
 # syntax highlighting
 
-source ~/.zsh/catppuccin_frappe-zsh-syntax-highlighting.zsh
+source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Amazon Q post block. Keep at the bottom of this file.
