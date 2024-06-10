@@ -61,6 +61,8 @@ alias nq='networkQuality'
 alias zshconfig="code ~/.zshrc"
 alias reload="source ~/.zshrc"
 
+alias fcat="fzf | xargs cat"
+alias ls="eza"
 la() {
   if [ "$1" = "-a" ]; then
     eza -la --no-permissions --no-user --no-filesize
@@ -77,6 +79,11 @@ alias mv='mv -iv'
 alias cl='clear'
 alias ipinfo='curl -s http://ip-api.com/json/ | jq "."'
 
+export EDITOR=/usr/bin/nano
+
+autoload -z edit-command-line
+zle -N edit-command-line
+bindkey "^X^E" edit-command-line
 
 # dir color meanings
 # da = date and time
