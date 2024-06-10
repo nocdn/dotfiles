@@ -1,5 +1,3 @@
-# Amazon Q pre block. Keep at the top of this file.
-[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
 # zsh Autosuggestions plugin manual installation
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 
@@ -84,6 +82,9 @@ export EDITOR=/usr/bin/nano
 autoload -z edit-command-line
 zle -N edit-command-line
 bindkey "^X^E" edit-command-line
+
+
+eval "$(gh copilot alias -- zsh)"
 
 # dir color meanings
 # da = date and time
@@ -289,6 +290,3 @@ export GEMINI_API_KEY=AIzaSyDhIwZkaJ0niXxSCftwewM__Bh1UDHFuv
 
 source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-# Amazon Q post block. Keep at the bottom of this file.
-[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
