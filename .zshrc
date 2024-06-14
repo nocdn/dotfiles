@@ -271,6 +271,13 @@ function dlyt() {
 }
 
 
+function gcp() {
+    ga *
+    read -r "commit_message?Commit message: "
+    git commit -m "$commit_message"
+    git push
+}
+
 # zeoxide initialization and iterm2 integration
 eval "$(zoxide init --cmd cd zsh)"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
