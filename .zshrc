@@ -272,7 +272,7 @@ function dlyt() {
 
 
 function gcp() {
-    ga *
+    ga .
     read -r "commit_message?Commit message: "
     git commit -m "$commit_message"
     git push
