@@ -278,6 +278,43 @@ function gcp() {
     git push
 }
 
+upload() {
+    local short=false
+    local file_path=""
+
+    # parse arguments
+    while [[ "$#" -gt 0 ]]; do
+        case $1 in
+            -s|--short) short=true ;;
+            *) file_path="$1" ;;
+        esac
+        shift
+    done
+
+    # check if file path is provided
+    if [[ -z "$file_path" ]]; then
+        echo "Usage: upload [-s|--short] <file_path>"
+        return 1
+    fi
+
+    # upload file and get URL
+    local base_url="https://waifuvault.moe/rest"
+    local upload_url=$(curl -s --request PUT --url "$base_url" \
+                        --header 'Content-Type: multipart/form-data' \
+                        --form file=@"$file_path" | jq -r .url)
+
+    # copy upload URL to clipboard
+    echo "$upload_url" | pbcopy
+    echo "$upload_url"
+    
+    # do URL shortening if -s or --short flag passed
+    if $short; then
+        local short_url=$(curl -s "https://is.gd/create.php?format=simple&url=$upload_url")
+        echo "$short_url" | pbcopy
+        echo "$short_url"
+    fi
+}
+
 # zeoxide initialization and iterm2 integration
 eval "$(zoxide init --cmd cd zsh)"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
