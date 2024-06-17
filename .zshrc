@@ -298,6 +298,7 @@ upload() {
     fi
 
     # upload file and get URL
+    echo "Uploading file: "
     local base_url="https://waifuvault.moe/rest"
     local upload_url=$(curl --progress-bar --request PUT --url "$base_url" \
                         --header 'Content-Type: multipart/form-data' \
