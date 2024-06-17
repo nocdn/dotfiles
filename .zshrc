@@ -61,13 +61,9 @@ alias reload="source ~/.zshrc"
 
 alias fcat="fzf | xargs cat"
 alias ls="eza"
-la() {
-  if [ "$1" = "-a" ]; then
-    eza -la --no-permissions --no-user --no-filesize
-  else
-    eza -l --no-permissions --no-user --no-filesize "$@"
-  fi
-}
+alias la="eza -l --no-permissions --no-user --no-filesize"
+alias laa="eza -la --no-permissions --no-user --no-filesize"
+
 alias gs='git status'
 alias ga='git add'
 alias gp='git push'
@@ -82,9 +78,6 @@ export EDITOR=/usr/bin/nano
 autoload -z edit-command-line
 zle -N edit-command-line
 bindkey "^X^E" edit-command-line
-
-
-eval "$(gh copilot alias -- zsh)"
 
 # dir color meanings
 # da = date and time
@@ -299,7 +292,7 @@ upload() {
 
     # upload file and get URL
     echo "Uploading file: "
-    local base_url="https://waifuvault.moe/rest"
+    local base_url="https://waifuvault.moe/rest?expires=2m"
     local upload_url=$(curl --progress-bar --request PUT --url "$base_url" \
                         --header 'Content-Type: multipart/form-data' \
                         --form file=@"$file_path" | jq -r .url)
