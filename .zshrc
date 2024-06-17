@@ -299,7 +299,7 @@ upload() {
 
     # upload file and get URL
     local base_url="https://waifuvault.moe/rest"
-    local upload_url=$(curl -s --request PUT --url "$base_url" \
+    local upload_url=$(curl --progress-bar --request PUT --url "$base_url" \
                         --header 'Content-Type: multipart/form-data' \
                         --form file=@"$file_path" | jq -r .url)
 
@@ -313,6 +313,57 @@ upload() {
         echo "$short_url" | pbcopy
         echo "$short_url"
     fi
+}
+
+transcribe() {
+    local file_url=""
+    local is_local=false
+
+    # parse arguments
+    while [[ "$#" -gt 0 ]]; do
+        case $1 in
+            -f|--file)
+                is_local=true
+                file_url="$2"
+                shift 2
+                ;;
+            *)
+                file_url="$1"
+                shift
+                ;;
+        esac
+    done
+
+    # If the -f flag is present, upload the file first
+    if $is_local; then
+        if [[ -z "$file_url" ]]; then
+            echo "Error: No file path provided."
+            echo "Usage: transcribe -f <file_path> or transcribe <file_url>"
+            return 1
+        fi
+        file_url=$(upload "$file_url")
+        if [[ $? -ne 0 ]]; then
+            echo "File upload failed."
+            return 1
+        fi
+    fi
+
+    if [[ -z "$file_url" ]]; then
+        echo "Error: No file URL provided."
+        echo "Usage: transcribe -f <file_path> or transcribe <file_url>"
+        return 1
+    fi
+
+    curl -s --request POST \
+        --url https://fal.run/fal-ai/wizper \
+        --header "Authorization: Key $FAL_KEY" \
+        --header "Content-Type: application/json" \
+        --data '{
+            "audio_url": "'"$file_url"'",
+            "language": "en",
+            "version": "3",
+            "task": "transcribe"
+        }' | jq .text -r
 }
 
 # zeoxide initialization and iterm2 integration
@@ -329,6 +380,7 @@ export DEEPSEEK_API_KEY=sk-fc598b820bba45d48968591ccc00764a
 export TOGETHERAI_API_KEY=cf2be16d4bcc109c94d53eb228a7033bbd62861239b1ce57e55993756ca82c38
 export LLAMA_CLOUD_API_KEY=llx-rCJtFrQd3ehoc7ofjFwAefQ1KQU7JpDQ5MBxCP7U3fHhYCim
 export GEMINI_API_KEY=AIzaSyDhIwZkaJ0niXxSCftwewM__Bh1UDHFuv
+export FAL_KEY=4d7b7a59-11c2-4d2e-85bb-1721a52df222:24976836119b9637eb3468f0eba02483
 
 
 # syntax highlighting
