@@ -354,12 +354,15 @@ transcribe() {
         return 1
     fi
 
+    # Encode the file URL to handle spaces
+    encoded_url=$(echo "$file_url" | sed 's/ /%20/g')
+
     curl -s --request POST \
         --url https://fal.run/fal-ai/wizper \
         --header "Authorization: Key $FAL_KEY" \
         --header "Content-Type: application/json" \
         --data '{
-            "audio_url": "'"$file_url"'",
+            "audio_url": "'"$encoded_url"'",
             "language": "en",
             "version": "3",
             "task": "transcribe"
