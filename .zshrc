@@ -290,16 +290,20 @@ upload() {
         return 1
     fi
 
+    # Log file path
+    # echo "Uploading file: $file_path"
+
     # upload file and get URL
-    echo "Uploading file: "
     local base_url="https://waifuvault.moe/rest?expires=2m"
     local upload_url=$(curl --progress-bar --request PUT --url "$base_url" \
                         --header 'Content-Type: multipart/form-data' \
                         --form file=@"$file_path" | jq -r .url)
 
+    # Log upload URL
+    echo "$upload_url"
+
     # copy upload URL to clipboard
     echo "$upload_url" | pbcopy
-    echo "$upload_url"
     
     # do URL shortening if -s or --short flag passed
     if $short; then
@@ -307,6 +311,7 @@ upload() {
         echo "$short_url" | pbcopy
         echo "$short_url"
     fi
+
 }
 
 transcribe() {
@@ -333,6 +338,9 @@ transcribe() {
         esac
     done
 
+    # Log arguments
+    # echo "Arguments: is_local=$is_local, file_url=$file_url, output_file=$output_file"
+
     # If the -f flag is present, upload the file first
     if $is_local; then
         if [[ -z "$file_url" ]]; then
@@ -340,11 +348,13 @@ transcribe() {
             echo "Usage: transcribe -f <file_path> [-o <output_file>] or transcribe <file_url> [-o <output_file>]"
             return 1
         fi
+        echo "Uploading file: $file_url"
         file_url=$(upload "$file_url")
         if [[ $? -ne 0 ]]; then
             echo "File upload failed."
             return 1
         fi
+        # echo "Uploaded file URL: $file_url"
     fi
 
     if [[ -z "$file_url" ]]; then
@@ -355,6 +365,7 @@ transcribe() {
 
     # Encode the file URL to handle spaces
     encoded_url=$(echo "$file_url" | sed 's/ /%20/g')
+    # echo "Encoded URL: $encoded_url"
 
     # Perform transcription
     local transcription=$(curl -s --request POST \
@@ -368,6 +379,9 @@ transcribe() {
             "task": "transcribe"
         }' | jq .text -r)
 
+    # Log transcription
+    echo "$transcription"
+
     # Copy transcription to clipboard
     echo "$transcription" | pbcopy
 
@@ -376,7 +390,7 @@ transcribe() {
         echo "$transcription" > "$output_file"
         echo "Transcription saved to: $output_file"
     else
-        echo "$transcription"
+        # echo "$transcription"
     fi
 }
 
