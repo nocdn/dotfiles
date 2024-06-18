@@ -312,6 +312,7 @@ upload() {
 transcribe() {
     local file_url=""
     local is_local=false
+    local output_file=""
 
     # parse arguments
     while [[ "$#" -gt 0 ]]; do
@@ -319,6 +320,10 @@ transcribe() {
             -f|--file)
                 is_local=true
                 file_url="$2"
+                shift 2
+                ;;
+            -o|--output)
+                output_file="$2"
                 shift 2
                 ;;
             *)
@@ -332,7 +337,7 @@ transcribe() {
     if $is_local; then
         if [[ -z "$file_url" ]]; then
             echo "Error: No file path provided."
-            echo "Usage: transcribe -f <file_path> or transcribe <file_url>"
+            echo "Usage: transcribe -f <file_path> [-o <output_file>] or transcribe <file_url> [-o <output_file>]"
             return 1
         fi
         file_url=$(upload "$file_url")
@@ -344,14 +349,15 @@ transcribe() {
 
     if [[ -z "$file_url" ]]; then
         echo "Error: No file URL provided."
-        echo "Usage: transcribe -f <file_path> or transcribe <file_url>"
+        echo "Usage: transcribe -f <file_path> [-o <output_file>] or transcribe <file_url> [-o <output_file>]"
         return 1
     fi
 
     # Encode the file URL to handle spaces
     encoded_url=$(echo "$file_url" | sed 's/ /%20/g')
 
-    curl -s --request POST \
+    # Perform transcription
+    local transcription=$(curl -s --request POST \
         --url https://fal.run/fal-ai/wizper \
         --header "Authorization: Key $FAL_KEY" \
         --header "Content-Type: application/json" \
@@ -360,7 +366,18 @@ transcribe() {
             "language": "en",
             "version": "3",
             "task": "transcribe"
-        }' | jq .text -r
+        }' | jq .text -r)
+
+    # Copy transcription to clipboard
+    echo "$transcription" | pbcopy
+
+    # If output file is specified, save transcription to file and output file path
+    if [[ -n "$output_file" ]]; then
+        echo "$transcription" > "$output_file"
+        echo "Transcription saved to: $output_file"
+    else
+        echo "$transcription"
+    fi
 }
 
 # zeoxide initialization and iterm2 integration
