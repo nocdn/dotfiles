@@ -1,7 +1,7 @@
 sudo apt update
 sudo apt upgrade -y
 
-sudo apt install -y nano wget curl zip neofetch python3 pgp gawk make fzf git
+sudo apt install -y nano wget curl zip neofetch python3 pgp gawk make fzf git awscli jq
 
 git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
 
