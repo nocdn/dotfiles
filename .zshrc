@@ -394,6 +394,19 @@ transcribe() {
     fi
 }
 
+function compressspeech() {
+    local file_name="$1"
+    local file_name_without_extension="${file_name%.*}"
+    local opus_file_name="$file_name_without_extension.opus"
+
+    ffmpeg -loglevel error -i "$file_name" -c:a libopus -ac 1 -ar 16000 -b:a 16k "$opus_file_name"
+}
+
+function duh() {
+    local file_name="$1"
+    du -h "$file_name"
+}
+
 # zeoxide initialization and iterm2 integration
 eval "$(zoxide init --cmd cd zsh)"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
