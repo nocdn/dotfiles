@@ -394,12 +394,33 @@ transcribe() {
     fi
 }
 
-function compressspeech() {
-    local file_name="$1"
-    local file_name_without_extension="${file_name%.*}"
-    local opus_file_name="$file_name_without_extension.opus"
+function compressAudio() {
+    # check if input file is provided
+    if [[ $# -eq 0 ]]; then
+        echo "usage: compress_audio <input_file>"
+        return 1
+    fi
 
-    ffmpeg -loglevel error -i "$file_name" -c:a libopus -ac 1 -ar 16000 -b:a 16k "$opus_file_name"
+    input_file="$1"
+    
+    # ask for parameters
+    read "bitrate?enter bitrate (default: 16k): "
+    read "sample_rate?enter sample rate (default: 16000): "
+    read "format?enter output format (default: opus): "
+
+    # set defaults if empty
+    bitrate=${bitrate:-16k}
+    sample_rate=${sample_rate:-16000}
+    format=${format:-opus}
+
+    # get input filename without extension
+    filename=$(basename "$input_file" | sed 's/\.[^.]*$//')
+
+    # construct output filename
+    output_file="${filename}.${format}"
+
+    # run ffmpeg command
+    ffmpeg -i "$input_file" -ac 1 -ar "$sample_rate" -b:a "$bitrate" "$output_file"
 }
 
 function duh() {
@@ -428,3 +449,4 @@ export FAL_KEY=4d7b7a59-11c2-4d2e-85bb-1721a52df222:24976836119b9637eb3468f0eba0
 
 source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+if [ -f "/Users/bartek/.config/fabric/fabric-bootstrap.inc" ]; then . "/Users/bartek/.config/fabric/fabric-bootstrap.inc"; fi
