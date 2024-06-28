@@ -171,76 +171,121 @@ function tempinstance() {
 }
 
 function stopinstances {
+    local instance_name="$1"
+
     # Get the list of running instances
     local instances=$(gcloud compute instances list --filter="status=RUNNING" --format="table[no-heading](name, zone)")
-
     # Check if any instances are running
     if [[ -z "$instances" ]]; then
         echo "No running instances found."
         return
     fi
-
     # Convert the instances list to an array
     local instance_array=("${(@f)instances}")
 
-    # Display the list of running instances
-    echo "Please select an instance to stop:"
-    for ((i = 1; i <= ${#instance_array[@]}; i++)); do
-        echo "$i. ${instance_array[$i]%% *}"
-    done
-
-    # Read user input
-    read -r "selection?Enter the number corresponding to the instance you want to stop: "
-
-    if [[ $selection -gt 0 && $selection -le ${#instance_array[@]} ]]; then
-        # Get the selected instance details
-        local selected_instance="${instance_array[$((selection))]}"
-        local selected_instance_name="${selected_instance%% *}"
-        local selected_instance_zone="${selected_instance##* }"
-
-        echo "Stopping instance: $selected_instance_name in zone: $selected_instance_zone"
-
-        # Run the gcloud command to stop the selected instance
-        gcloud compute instances stop "$selected_instance_name" --zone="$selected_instance_zone"
+    if [[ -n "$instance_name" ]]; then
+        # Check if the provided instance name exists in the list
+        local found=false
+        for instance in "${instance_array[@]}"; do
+            if [[ "${instance%% *}" == "$instance_name" ]]; then
+                local selected_instance_name="$instance_name"
+                local selected_instance_zone="${instance##* }"
+                found=true
+                break
+            fi
+        done
+        if ! $found; then
+            echo "Instance '$instance_name' not found or not running."
+            return
+        fi
     else
-        echo "Invalid selection. Please try again."
+        # Display the list of running instances
+        echo "Please select an instance to stop:"
+        for ((i = 1; i <= ${#instance_array[@]}; i++)); do
+            echo "$i. ${instance_array[$i]%% *}"
+        done
+        # Read user input
+        read -r "selection?Enter the number corresponding to the instance you want to stop: "
+        if [[ $selection -gt 0 && $selection -le ${#instance_array[@]} ]]; then
+            # Get the selected instance details
+            local selected_instance="${instance_array[$((selection))]}"
+            local selected_instance_name="${selected_instance%% *}"
+            local selected_instance_zone="${selected_instance##* }"
+        else
+            echo "Invalid selection. Please try again."
+            return
+        fi
     fi
+
+    echo "Stopping instance: $selected_instance_name in zone: $selected_instance_zone"
+    # Run the gcloud command to stop the selected instance
+    gcloud compute instances stop "$selected_instance_name" --zone="$selected_instance_zone"
 }
 
 function startinstances {
-    # Get the list of running instances
-    local instances=$(gcloud compute instances list --filter="status=TERMINATED" --format="table[no-heading](name, zone)")
+    local instance_name="$1"
 
-    # Check if any instances are running
+    # Get the list of terminated instances
+    local instances=$(gcloud compute instances list --filter="status=TERMINATED" --format="table[no-heading](name, zone)")
+    # Check if any instances are terminated
     if [[ -z "$instances" ]]; then
-        echo "No running instances found."
+        echo "No terminated instances found."
         return
     fi
-
     # Convert the instances list to an array
     local instance_array=("${(@f)instances}")
 
-    # Display the list of running instances
-    echo "Please select an instance to start:"
-    for ((i = 1; i <= ${#instance_array[@]}; i++)); do
-        echo "$i. ${instance_array[$i]%% *}"
-    done
-
-    # Read user input
-    read -r "selection?Enter the number corresponding to the instance you want to start: "
-
-    if [[ $selection -gt 0 && $selection -le ${#instance_array[@]} ]]; then
-        # Get the selected instance details
-        local selected_instance="${instance_array[$((selection))]}"
-        local selected_instance_name="${selected_instance%% *}"
-        local selected_instance_zone="${selected_instance##* }"
-
-        echo "Starting instance: $selected_instance_name in zone: $selected_instance_zone"
-
-        # Run the gcloud command to stop the selected instance
-        gcloud compute instances start "$selected_instance_name" --zone="$selected_instance_zone"
+    if [[ -n "$instance_name" ]]; then
+        # Check if the provided instance name exists in the list
+        local found=false
+        for instance in "${instance_array[@]}"; do
+            if [[ "${instance%% *}" == "$instance_name" ]]; then
+                local selected_instance_name="$instance_name"
+                local selected_instance_zone="${instance##* }"
+                found=true
+                break
+            fi
+        done
+        if ! $found; then
+            echo "Instance '$instance_name' not found or not terminated."
+            return
+        fi
     else
-        echo "Invalid selection. Please try again."
+        # Display the list of terminated instances
+        echo "Please select an instance to start:"
+        for ((i = 1; i <= ${#instance_array[@]}; i++)); do
+            echo "$i. ${instance_array[$i]%% *}"
+        done
+        # Read user input
+        read -r "selection?Enter the number corresponding to the instance you want to start: "
+        if [[ $selection -gt 0 && $selection -le ${#instance_array[@]} ]]; then
+            # Get the selected instance details
+            local selected_instance="${instance_array[$((selection))]}"
+            local selected_instance_name="${selected_instance%% *}"
+            local selected_instance_zone="${selected_instance##* }"
+        else
+            echo "Invalid selection. Please try again."
+            return
+        fi
+    fi
+
+    echo "Starting instance: $selected_instance_name in zone: $selected_instance_zone"
+    # Run the gcloud command to start the selected instance
+    gcloud compute instances start "$selected_instance_name" --zone="$selected_instance_zone"
+
+    # Wait a bit for the instance to fully start
+    echo "Waiting for instance to initialize..."
+    sleep 10
+
+    # Get the external IP address
+    local external_ip=$(gcloud compute instances describe "$selected_instance_name" --zone="$selected_instance_zone" --format="get(networkInterfaces[0].accessConfigs[0].natIP)")
+
+    if [[ -n "$external_ip" ]]; then
+        echo "External IP: $external_ip"
+        echo "Connecting to instance..."
+        sshinstance "$external_ip"
+    else
+        echo "Could not find external IP. Please check the instance status and try to connect manually."
     fi
 }
 
