@@ -473,6 +473,73 @@ function duh() {
     du -h "$file_name"
 }
 
+rename() {
+    # Function to process a single file
+    process_file() {
+        local fullFilePath="$1"
+        local filename=$(basename "$fullFilePath")
+        local extension="${filename##*.}"
+        local filenameWithoutExt="${filename%.*}"
+        local dirPath=$(dirname "$fullFilePath")
+
+        # Escape the system prompt for JSON
+        local systemPrompt=$(jq -n --arg sp "Rename the given filename by the user, ensuring clarity and brevity. Retain essential elements like names, chapter numbers, episode codes, dates, etc., replacing underscores and dashes with spaces (unless it is times or dates, then keep the dates combined with dashes only, use DD-MM-YYYY). Capitalise first letters. Never capilatize the word 'and'. Remove non-informative text like 'version', 'final', 'edit', or repetitive information. Provide the new filename without the extension. Expand abbreviations like 'lang\" to language'. NEVER use quotes. For TV series use this format: [Film title with capitalized first letters of each word] [Episode code]. In TV series, remove the year from the filename. Examples: 'thesis_final_edit_v2' becomes 'Thesis V2'; 'JohnDoe_Report_Version_23.10.2021' becomes 'John Doe Report 23-10-2021'; 'Barbie.2023.HC.1080p.WEB-DL.AAC2.0.H.264-APEX[TGx]' becomes 'Barbie'; 'What.If.2021.S02E08.WEB.x264-TORRENTGALAXY' becomes 'What If S02E08'." '$sp')
+
+        local response=$(curl -s https://api.anthropic.com/v1/messages \
+          -H "Content-Type: application/json" \
+          -H "x-api-key: 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" \
+          -H "anthropic-version: 2023-06-01" \
+          -d "$(jq -n \
+            --arg model "claude-3-5-sonnet-20240620" \
+            --arg system "$systemPrompt" \
+            --arg user_content "$filenameWithoutExt" \
+            '{
+              model: $model,
+              max_tokens: 1024,
+              system: $system,
+              messages: [
+                {role: "user", content: $user_content}
+              ]
+            }'
+          )")
+
+        # Extract the new filename from the response
+        local newFilename=$(echo "$response" | jq -r '.content[0].text')
+
+        # Ensure newFilename is not empty
+        if [[ -z "$newFilename" ]]; then
+            echo "Error: Failed to generate new filename for $filename"
+            return 1
+        fi
+
+        # Construct the new full file path
+        local newFullFilePath="$dirPath/$newFilename.$extension"
+
+        # Rename the file
+        if mv "$fullFilePath" "$newFullFilePath"; then
+            echo "File successfully renamed to: $newFilename.$extension"
+        else
+            echo "Error: Failed to rename the file $filename"
+            return 1
+        fi
+    }
+
+    # Main function logic
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: rename <file1> [file2] [file3] ..."
+        return 1
+    fi
+
+    # Loop through all provided files
+    for file in "$@"; do
+        if [[ -f "$file" ]]; then
+            process_file "$file"
+        else
+            echo "Error: File not found - $file"
+        fi
+    done
+}
+
 # zeoxide initialization and iterm2 integration
 eval "$(zoxide init --cmd cd zsh)"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
