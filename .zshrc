@@ -58,6 +58,7 @@ alias act='source bin/activate'
 alias nq='networkQuality'
 alias zshconfig="code ~/.zshrc"
 alias reload="source ~/.zshrc"
+alias hist="cat .zsh_history | fzf | pbcopy"
 
 alias fcat="fzf | xargs cat"
 alias ls="eza"
@@ -592,6 +593,40 @@ rename() {
             echo "Error: File not found - $file"
         fi
     done
+}
+
+github_repo_init() {
+    # Check if a repository name was provided
+    if [ -z "$1" ]; then
+        echo "Please provide a repository name."
+        return 1
+    fi
+
+    local repo_name=$1
+
+    # Create the directory and navigate into it
+    mkdir $repo_name && cd $repo_name
+
+    # Initialize the local git repository
+    git init
+
+    # Create an initial file
+    echo "# $repo_name" > README.md
+
+    # Add and commit the README file
+    git add README.md
+    git commit -m "Initial commit"
+
+    # Rename the branch to 'main'
+    git branch -M main
+
+    # Create a new repository on GitHub
+    gh repo create $repo_name --public --source=. --remote=origin
+
+    # Push the changes to GitHub
+    git push -u origin main
+
+    echo "Repository $repo_name has been created and pushed to GitHub."
 }
 
 # zeoxide initialization and iterm2 integration
