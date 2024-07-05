@@ -319,7 +319,6 @@ function gcp() {
 upload() {
     local short=false
     local file_path=""
-
     # parse arguments
     while [[ "$#" -gt 0 ]]; do
         case $1 in
@@ -328,25 +327,30 @@ upload() {
         esac
         shift
     done
-
     # check if file path is provided
     if [[ -z "$file_path" ]]; then
         echo "Usage: upload [-s|--short] <file_path>"
         return 1
     fi
 
-    # Log file path
-    # echo "Uploading file: $file_path"
+    # Get file size in bytes
+    local file_size=$(stat -f%z "$file_path")
+    local size_limit=$((99 * 1024 * 1024))  # 99MB in bytes
 
-    # upload file and get URL
-    local base_url="https://waifuvault.moe/rest?expires=2m"
-    local upload_url=$(curl --progress-bar --request PUT --url "$base_url" \
-                        --header 'Content-Type: multipart/form-data' \
-                        --form file=@"$file_path" | jq -r .url)
+    local upload_url=""
+    if [ "$file_size" -gt "$size_limit" ]; then
+        # Use 0x0 for files over 99MB
+        upload_url=$(curl -s -F "file=@$file_path" https://0x0.st)
+    else
+        # Use waifuvault.moe for files 99MB or smaller
+        local base_url="https://waifuvault.moe/rest?expires=2m"
+        upload_url=$(curl --progress-bar --request PUT --url "$base_url" \
+                            --header 'Content-Type: multipart/form-data' \
+                            --form file=@"$file_path" | jq -r .url)
+    fi
 
     # Log upload URL
     echo "$upload_url"
-
     # copy upload URL to clipboard
     echo "$upload_url" | pbcopy
     
@@ -356,7 +360,6 @@ upload() {
         echo "$short_url" | pbcopy
         echo "$short_url"
     fi
-
 }
 
 transcribe() {
@@ -544,7 +547,7 @@ rename() {
 eval "$(zoxide init --cmd cd zsh)"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-source .zsh_secrets
+source ~/.zsh_secrets
 
 # syntax highlighting
 
