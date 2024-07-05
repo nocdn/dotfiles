@@ -319,6 +319,26 @@ function gcp() {
 upload() {
     local short=false
     local file_path=""
+    
+    # Check for help flag
+    if [[ "$1" == "--help" ]]; then
+        echo "\nUsage: upload [-s|--short] <file_path>"
+        echo
+        echo "Description:"
+        echo "  Uploads a file to a file hosting service and copies the URL to the clipboard."
+        echo
+        echo "Options:"
+        echo "  -s, --short    Generate and output a shortened URL"
+        echo "  --help         Display this help message"
+        echo
+        echo "Details:"
+        echo "  - For files up to 99MB, uploads to waifuvault.moe"
+        echo "  - For files over 99MB, uploads to 0x0.st"
+        echo "  - The resulting URL is automatically copied to the clipboard"
+        echo "  - If -s or --short flag used, a shortened URL is generated, copied instead\n"
+        return 0
+    fi
+
     # parse arguments
     while [[ "$#" -gt 0 ]]; do
         case $1 in
@@ -330,13 +350,12 @@ upload() {
     # check if file path is provided
     if [[ -z "$file_path" ]]; then
         echo "Usage: upload [-s|--short] <file_path>"
+        echo "Use 'upload --help' for more information."
         return 1
     fi
-
     # Get file size in bytes
     local file_size=$(stat -f%z "$file_path")
     local size_limit=$((99 * 1024 * 1024))  # 99MB in bytes
-
     local upload_url=""
     if [ "$file_size" -gt "$size_limit" ]; then
         # Use 0x0 for files over 99MB
@@ -348,7 +367,6 @@ upload() {
                             --header 'Content-Type: multipart/form-data' \
                             --form file=@"$file_path" | jq -r .url)
     fi
-
     # Log upload URL
     echo "$upload_url"
     # copy upload URL to clipboard
@@ -363,6 +381,33 @@ upload() {
 }
 
 transcribe() {
+    # Check for help flag
+    if [[ "$1" == "--help" ]]; then
+        echo "\nUsage: transcribe [-f|--file <file_path>] [<file_url>] [-o|--output <output_file>]"
+        echo
+        echo "Description:"
+        echo "  Transcribes audio from a file or URL using the fal.ai Wizper service."
+        echo
+        echo "Options:"
+        echo "  -f, --file <file_path>          Specify a local file to upload and transcribe"
+        echo "  -o, --output <output_file>      Save the transcription to a file"
+        echo "  --help                          Display this help message"
+        echo
+        echo "Arguments:"
+        echo "  <file_url>                      URL of audio file to transcribe (if not using -f)"
+        echo
+        echo "Details:"
+        echo "  - If -f is used, the local file is first uploaded using the 'upload' function"
+        echo "  - The transcription is performed using the fal.ai Wizper service"
+        echo "  - The resulting transcription is displayed in the terminal"
+        echo "  - The transcription is automatically copied to the clipboard"
+        echo "  - If -o is used, the transcription is also saved to the specified file"
+        echo
+        echo "Environment Variables:"
+        echo "  FAL_KEY                          API key for the fal.ai service (must be set)\n"
+        return 0
+    fi
+
     local file_url=""
     local is_local=false
     local output_file=""
