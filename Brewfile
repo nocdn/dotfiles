@@ -1,13 +1,21 @@
+tap "felixkratz/formulae"
 tap "homebrew/bundle"
 tap "mongodb/brew"
 tap "ngrok/ngrok"
+tap "peak/tap"
 tap "teamookla/speedtest"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
 # Arbitrary precision numeric processing language
 brew "bc"
 # Implementation of the DNS protocols
 brew "bind"
+# GNU compiler collection
+brew "gcc"
+# Resource monitor. C++ version and continuation of bashtop and bpytop
+brew "btop"
 # Interpreted, interactive, object-oriented programming language
-brew "python@3.12"
+brew "python@3.11"
 # Core application library for C
 brew "glib"
 # Run arbitrary commands when files change
@@ -34,48 +42,60 @@ brew "tesseract"
 brew "ffmpeg"
 # Command-line fuzzy finder written in Go
 brew "fzf"
-# GNU compiler collection
-brew "gcc"
+# GitHub command-line tool
+brew "gh"
 # Distributed revision control system
 brew "git"
+# Syntax-highlighting pager for git and diff output
+brew "git-delta"
+# Terminal based graphical activity monitor inspired by gtop and vtop
+brew "gotop"
 # Lightweight and flexible command-line JSON processor
 brew "jq"
-# Access large language models from the command-line
-brew "llm"
 # Video processing framework with simplicity in mind
 brew "vapoursynth"
 # Feature-rich command-line audio/video downloader
-brew "yt-dlp"
+brew "yt-dlp", link: false
 # Media player based on MPlayer and mplayer2
 brew "mpv"
 # Fast, highly customisable system info script
 brew "neofetch"
+# QR Code generation
+brew "qrencode"
+# Display directories as trees (with optional color/HTML output)
+brew "tree"
+# Password manager
+brew "pass"
+# Execute binaries from Python packages in isolated environments
+brew "pipx"
 # Manage compile and link flags for libraries
 brew "pkg-config"
 # Cross-platform library for audio I/O
 brew "portaudio"
 # Python 3 bindings for the Cairo graphics library
 brew "py3cairo"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.10"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.11"
+# Transfer files to and from your computer by scanning a QR code
+brew "qrcp"
 # Software for mathematics, science, and engineering
 brew "scipy"
+# SOund eXchange: universal sound sample translator
+brew "sox"
 # System performance benchmark tool
 brew "sysbench"
 # Programmatically correct mistyped console commands
 brew "thefuck"
 # Internet file retriever
 brew "wget"
-# Swift native on-device speech recognition with Whisper for Apple Silicon
-brew "whisperkit-cli"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
-# Next-generation plugin manager for zsh
-brew "zplug"
+# Fish shell like syntax highlighting for zsh
+brew "zsh-syntax-highlighting"
+# Parallel S3 and local filesystem execution tool
+brew "peak/tap/s5cmd"
 # Ookla Speedtest
 brew "teamookla/speedtest/speedtest"
+# Command-line interface for 1Password
+cask "1password-cli"
 # Android SDK component
 cask "android-platform-tools"
 # Set of tools to manage resources and applications hosted on Google Cloud
@@ -84,44 +104,5 @@ cask "google-cloud-sdk"
 cask "linearmouse"
 # Full TeX Live distribution without GUI applications
 cask "mactex-no-gui"
-# Reverse proxy, secure introspectable tunnels to localhost
-cask "ngrok"
 # Music player for The Hype Machine
 cask "plug"
-vscode "adpyke.codesnap"
-vscode "akamud.vscode-theme-onedark"
-vscode "akamud.vscode-theme-onelight"
-vscode "amazonwebservices.aws-toolkit-vscode"
-vscode "arthurwhite.white"
-vscode "eamodio.gitlens"
-vscode "esbenp.prettier-vscode"
-vscode "github.codespaces"
-vscode "github.copilot"
-vscode "github.copilot-chat"
-vscode "github.remotehub"
-vscode "glenn2223.live-sass"
-vscode "kisstkondoros.vscode-gutter-preview"
-vscode "maciejdems.add-to-gitignore"
-vscode "meganrogge.template-string-converter"
-vscode "ms-azuretools.vscode-docker"
-vscode "ms-python.debugpy"
-vscode "ms-python.isort"
-vscode "ms-python.python"
-vscode "ms-python.vscode-pylance"
-vscode "ms-vscode-remote.remote-wsl"
-vscode "ms-vscode.makefile-tools"
-vscode "ms-vscode.remote-repositories"
-vscode "naumovs.color-highlight"
-vscode "pkief.material-icon-theme"
-vscode "pnp.polacode"
-vscode "proxzima.sweetdracula"
-vscode "rangav.vscode-thunder-client"
-vscode "ritwickdey.liveserver"
-vscode "shd101wyy.markdown-preview-enhanced"
-vscode "sswg.swift-lang"
-vscode "supermaven.supermaven"
-vscode "tyriar.vscode-terminal-here"
-vscode "vadimcn.vscode-lldb"
-vscode "vknabel.vscode-apple-swift-format"
-vscode "whetstonetechnologiesinc.speechmarkdown-vscode"
-vscode "yzhang.markdown-all-in-one"
