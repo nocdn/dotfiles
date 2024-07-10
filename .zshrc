@@ -500,11 +500,13 @@ function compressAudio() {
     read "bitrate?enter bitrate (default: 16k): "
     read "sample_rate?enter sample rate (default: 16000): "
     read "format?enter output format (default: opus): "
+    read "speed_multiplier?enter speed multiplier (default: 1): "
 
     # set defaults if empty
     bitrate=${bitrate:-16k}
     sample_rate=${sample_rate:-16000}
     format=${format:-opus}
+    speed_multiplier=${speed_multiplier:-1}
 
     # get input filename without extension
     filename=$(basename "$input_file" | sed 's/\.[^.]*$//')
@@ -512,8 +514,12 @@ function compressAudio() {
     # construct output filename
     output_file="${filename}.${format}"
 
-    # run ffmpeg command
-    ffmpeg -i "$input_file" -ac 1 -ar "$sample_rate" -b:a "$bitrate" "$output_file"
+    # run ffmpeg command with speed adjustment
+    if (( $(echo "$speed_multiplier == 1" | bc -l) )); then
+        ffmpeg -i "$input_file" -ac 1 -ar "$sample_rate" -b:a "$bitrate" "$output_file"
+    else
+        ffmpeg -i "$input_file" -filter:a "atempo=$speed_multiplier" -ac 1 -ar "$sample_rate" -b:a "$bitrate" "$output_file"
+    fi
 }
 
 function duh() {
