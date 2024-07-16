@@ -629,6 +629,26 @@ github_repo_init() {
     echo "Repository $repo_name has been created and pushed to GitHub."
 }
 
+function combine() {
+    local dir="${1:-.}"  # use current directory if no argument provided
+    local output=""
+    
+    # find all files recursively
+    while IFS= read -r file; do
+        # get relative path
+        local rel_path="${file#$dir/}"
+        
+        # add formatted header and file contents to output
+        output+="# $rel_path contents:\n\n"
+        output+="$(cat "$file")\n\n\n"
+    done < <(find "$dir" -type f)
+    
+    # output and copy to clipboard simultaneously
+    echo -e "$output" | tee >(pbcopy)
+    
+    echo "Contents have been displayed and copied to clipboard."
+}
+
 # zeoxide initialization and iterm2 integration
 eval "$(zoxide init --cmd cd zsh)"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
