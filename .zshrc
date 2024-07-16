@@ -630,10 +630,60 @@ github_repo_init() {
 }
 
 function combine() {
-    local dir="${1:-.}"  # use current directory if no argument provided
+    local dir="."
+    local use_tree=false
+    local output_file=""
     local output=""
-    
-    # find all files recursively
+
+    # parse options
+    while getopts ":to:" opt; do
+        case ${opt} in
+            t ) use_tree=true ;;
+            o ) output_file=$OPTARG ;;
+            \? ) echo "Usage: combine [-t] [-o output_file] [directory]"; return 1 ;;
+        esac
+    done
+    shift $((OPTIND -1))
+
+    # set directory if provided
+    [[ $1 ]] && dir="$1"
+
+    # blacklist of files/directories to exclude
+    local blacklist=(
+        ".git"
+        ".gitignore"
+        ".css.map"
+        ".DS_Store"
+        "node_modules"
+        ".env"
+        ".vscode"
+        ".idea"
+        "*.log"
+        "*.tmp"
+        "*.temp"
+        "*.swp"
+        "*.swo"
+        "*.bak"
+        "*.cache"
+    )
+
+    # create grep patterns from blacklist
+    local grep_patterns=()
+    for item in "${blacklist[@]}"; do
+        grep_patterns+=("-e" "$(printf '%s' "$item" | sed 's/[.[\*^$/]/\\&/g')")
+    done
+
+    # add tree output if requested
+    if $use_tree; then
+        if command -v tree >/dev/null 2>&1; then
+            output+="# Directory structure:\n\n"
+            output+="$(tree -L 2 "$dir")\n\n\n"
+        else
+            echo "tree command not found. Skipping directory structure."
+        fi
+    fi
+
+    # find all files recursively, excluding blacklisted items
     while IFS= read -r file; do
         # get relative path
         local rel_path="${file#$dir/}"
@@ -641,12 +691,16 @@ function combine() {
         # add formatted header and file contents to output
         output+="# $rel_path contents:\n\n"
         output+="$(cat "$file")\n\n\n"
-    done < <(find "$dir" -type f)
-    
-    # output and copy to clipboard simultaneously
+    done < <(find "$dir" -type f | grep -v "${grep_patterns[@]}")
+
+    # output and copy to clipboard
     echo -e "$output" | tee >(pbcopy)
-    
-    echo "Contents have been displayed and copied to clipboard."
+
+    # save to file if requested
+    if [[ -n "$output_file" ]]; then
+        echo -e "$output" > "$output_file"
+        echo "Output saved to $output_file"
+    fi
 }
 
 # zeoxide initialization and iterm2 integration
