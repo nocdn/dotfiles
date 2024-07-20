@@ -665,6 +665,9 @@ function combine() {
         "*.swo"
         "*.bak"
         "*.cache"
+        ".jpeg"
+        ".png"
+        ".jpg"
     )
 
     # create grep patterns from blacklist
@@ -702,6 +705,65 @@ function combine() {
         echo "Output saved to $output_file"
     fi
 }
+
+ytdl() {
+    local url
+    if [[ -z "$1" ]]; then
+        echo -n "Enter YouTube URL: "
+        read -r url
+    else
+        url="$1"
+    fi
+
+    local type
+    type=$(echo -e "video\naudio" | fzf --prompt="Select type: " --header="↑↓:move ↵:select" --height=5 --layout=reverse)
+
+    local aFormat vQuality isAudioOnly
+    if [[ "$type" == "audio" ]]; then
+        aFormat=$(echo -e "mp3\nogg\nwav\nopus" | fzf --prompt="Select audio format: " --header="↑↓:move ↵:select" --height=7 --layout=reverse)
+        vQuality="144"  # Lowest quality for audio-only
+        isAudioOnly="true"
+    else
+        vQuality=$(echo -e "1080\n1440\nmax\n144\n240\n360\n480\n720\n2160" | fzf --prompt="Select video quality: " --header="↑↓:move ↵:select" --height=12 --layout=reverse)
+        aFormat="mp3"
+        isAudioOnly="false"
+    fi
+
+    echo "Downloading ${type}..."
+
+    local response
+    response=$(curl -s -X POST "https://api.cobalt.tools/api/json" \
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -d '{
+            "url": "'"$url"'",
+            "vCodec": "h264",
+            "vQuality": "'"$vQuality"'",
+            "aFormat": "'"$aFormat"'",
+            "filenamePattern": "pretty",
+            "isAudioOnly": '$isAudioOnly'
+        }')
+
+    local api_status download_url
+    api_status=$(echo "$response" | jq -r '.status')
+    download_url=$(echo "$response" | jq -r '.url')
+
+    if [[ "$api_status" == "error" ]]; then
+        echo "Error: $(echo "$response" | jq -r '.text')"
+    elif [[ "$api_status" == "stream" || "$api_status" == "redirect" ]]; then
+        echo "Download URL: $download_url"
+        echo "Starting download..."
+        local filename
+        filename=$(basename "$download_url")
+        curl -L -o "$filename" "$download_url"
+        echo "Download complete! File saved as: $filename"
+    else
+        echo "Unexpected status: $api_status"
+        echo "Full response: $response"
+    fi
+}
+
+source <(fzf --zsh)
 
 # zeoxide initialization and iterm2 integration
 eval "$(zoxide init --cmd cd zsh)"
