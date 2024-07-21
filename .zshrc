@@ -770,13 +770,13 @@ pythondev() {
     # Select Python version using fzf
     local python_version=$(echo "3.10\n3.11\n3.12" | fzf --height=5 --prompt="Select Python version: ")
 
-    # Ask if user wants to create a file
-    local create_file=$(echo "yes\nno" | fzf --height=4 --prompt="Do you want to create a Python file? ")
+    # Ask if user wants to create files
+    local create_files=$(echo "yes\nno" | fzf --height=4 --prompt="Do you want to create Python files? ")
 
-    local file_name=""
-    if [[ $create_file == "yes" ]]; then
-        echo "Enter the name of the Python file to create:"
-        read file_name
+    local file_names=""
+    if [[ $create_files == "yes" ]]; then
+        echo "Enter the names of the Python files to create (comma-separated):"
+        read file_names
     fi
 
     # Create and activate the virtual environment
@@ -784,10 +784,16 @@ pythondev() {
     cd $env_name
     source bin/activate
 
-    # Create the Python file if requested
-    if [[ $create_file == "yes" ]]; then
-        touch $file_name
-        echo "Created file: $file_name"
+    # Create the Python files if requested
+    if [[ $create_files == "yes" ]]; then
+        IFS=',' read -r -A files <<< "$file_names"
+        for file in "${files[@]}"; do
+            file=$(echo $file | xargs)  # Trim whitespace
+            if [[ -n "$file" ]]; then
+                touch "$file"
+                echo "Created file: $file"
+            fi
+        done
     fi
 
     echo "Python $python_version environment '$env_name' is now active."
