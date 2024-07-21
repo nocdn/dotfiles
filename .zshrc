@@ -52,7 +52,6 @@ nvm() {
 # personal aliases
 alias runwebdev='/Users/bartek/Scripts/Open-Web-Dev-Testing/openWebDevTest.sh'
 alias runcopilot='/Users/bartek/Scripts/Text-Copilot/runTextCopilot.sh'
-alias runpythondev='source /Users/bartek/Scripts/Python-Testing-Env/openPythonTest.sh'
 alias runcopilot='source /Users/bartek/Scripts/Typing-Copilot/runTypingCopilot.sh'
 alias act='source bin/activate'
 alias nq='networkQuality'
@@ -761,6 +760,37 @@ ytdl() {
         echo "Unexpected status: $api_status"
         echo "Full response: $response"
     fi
+}
+
+pythondev() {
+    # Ask for environment name
+    echo "Enter a name for your Python environment:"
+    read env_name
+
+    # Select Python version using fzf
+    local python_version=$(echo "3.10\n3.11\n3.12" | fzf --height=5 --prompt="Select Python version: ")
+
+    # Ask if user wants to create a file
+    local create_file=$(echo "yes\nno" | fzf --height=4 --prompt="Do you want to create a Python file? ")
+
+    local file_name=""
+    if [[ $create_file == "yes" ]]; then
+        echo "Enter the name of the Python file to create:"
+        read file_name
+    fi
+
+    # Create and activate the virtual environment
+    python$python_version -m venv $env_name
+    cd $env_name
+    source bin/activate
+
+    # Create the Python file if requested
+    if [[ $create_file == "yes" ]]; then
+        touch $file_name
+        echo "Created file: $file_name"
+    fi
+
+    echo "Python $python_version environment '$env_name' is now active."
 }
 
 source <(fzf --zsh)
