@@ -732,7 +732,7 @@ ytdl() {
     echo "Downloading ${type}..."
 
     local response
-    response=$(curl -s -X POST "https://api.cobalt.tools/api/json" \
+    response=$(curl -s -X POST "https://co.wuk.sh/api/json" \
         -H "Accept: application/json" \
         -H "Content-Type: application/json" \
         -d '{
