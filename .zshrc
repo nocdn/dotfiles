@@ -764,19 +764,17 @@ ytdl() {
 
 pythondev() {
     # Ask for environment name
-    echo "Enter a name for your Python environment:"
-    read env_name
+    read "env_name?Enter a name for your Python environment: "
 
     # Select Python version using fzf
     local python_version=$(echo "3.10\n3.11\n3.12" | fzf --height=5 --prompt="Select Python version: ")
 
     # Ask if user wants to create files
-    local create_files=$(echo "yes\nno" | fzf --height=4 --prompt="Do you want to create Python files? ")
+    local create_files=$(echo "no\nyes" | fzf --height=4 --prompt="Do you want to create Python files? ")
 
     local file_names=""
     if [[ $create_files == "yes" ]]; then
-        echo "Enter the names of the Python files to create (comma-separated):"
-        read file_names
+        read "file_names?Enter the names of the Python files to create (comma-separated): "
     fi
 
     # Create and activate the virtual environment
