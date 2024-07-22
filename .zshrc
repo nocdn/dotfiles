@@ -50,9 +50,6 @@ nvm() {
 
 
 # personal aliases
-alias runwebdev='/Users/bartek/Scripts/Open-Web-Dev-Testing/openWebDevTest.sh'
-alias runcopilot='/Users/bartek/Scripts/Text-Copilot/runTextCopilot.sh'
-alias runcopilot='source /Users/bartek/Scripts/Typing-Copilot/runTypingCopilot.sh'
 alias act='source bin/activate'
 alias nq='networkQuality'
 alias zshconfig="code ~/.zshrc"
