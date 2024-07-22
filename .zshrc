@@ -298,13 +298,6 @@ function deleteinstance() {
     gcloud compute instances delete "$instance_name"
 }
 
-function dlyt() {
-    # use the first argument as the url
-    local url=$1
-
-    yt-dlp "$url" -f "bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --output "%(title)s.%(ext)s"
-}
-
 
 function gcp() {
     ga .
@@ -714,49 +707,39 @@ ytdl() {
     local type
     type=$(echo -e "video\naudio" | fzf --prompt="Select type: " --header="↑↓:move ↵:select" --height=5 --layout=reverse)
 
-    local aFormat vQuality isAudioOnly
+    local format_option quality_option
     if [[ "$type" == "audio" ]]; then
+        local aFormat
         aFormat=$(echo -e "mp3\nogg\nwav\nopus" | fzf --prompt="Select audio format: " --header="↑↓:move ↵:select" --height=7 --layout=reverse)
-        vQuality="144"  # Lowest quality for audio-only
-        isAudioOnly="true"
+        format_option="--extract-audio --audio-format $aFormat"
+        quality_option="--audio-quality 0"
     else
+        local vQuality
         vQuality=$(echo -e "1080\n1440\nmax\n144\n240\n360\n480\n720\n2160" | fzf --prompt="Select video quality: " --header="↑↓:move ↵:select" --height=12 --layout=reverse)
-        aFormat="mp3"
-        isAudioOnly="false"
+        if [[ "$vQuality" == "max" ]]; then
+            format_option="-f bestvideo+bestaudio/best"
+        else
+            format_option="-f bestvideo[height<=$vQuality]+bestaudio/best[height<=$vQuality]"
+        fi
+        quality_option=""
     fi
 
     echo "Downloading ${type}..."
 
-    local response
-    response=$(curl -s -X POST "https://co.wuk.sh/api/json" \
-        -H "Accept: application/json" \
-        -H "Content-Type: application/json" \
-        -d '{
-            "url": "'"$url"'",
-            "vCodec": "h264",
-            "vQuality": "'"$vQuality"'",
-            "aFormat": "'"$aFormat"'",
-            "filenamePattern": "pretty",
-            "isAudioOnly": '$isAudioOnly'
-        }')
+    yt-dlp \
+        $format_option \
+        $quality_option \
+        --external-downloader aria2c \
+        --external-downloader-args "-x 16 -s 16 -k 1M" \
+        -o "%(title)s.%(ext)s" \
+        --no-playlist \
+        --embed-thumbnail \
+        --add-metadata \
+        --no-warnings \
+        --ignore-errors \
+        "$url"
 
-    local api_status download_url
-    api_status=$(echo "$response" | jq -r '.status')
-    download_url=$(echo "$response" | jq -r '.url')
-
-    if [[ "$api_status" == "error" ]]; then
-        echo "Error: $(echo "$response" | jq -r '.text')"
-    elif [[ "$api_status" == "stream" || "$api_status" == "redirect" ]]; then
-        echo "Download URL: $download_url"
-        echo "Starting download..."
-        local filename
-        filename=$(basename "$download_url")
-        curl -L -o "$filename" "$download_url"
-        echo "Download complete! File saved as: $filename"
-    else
-        echo "Unexpected status: $api_status"
-        echo "Full response: $response"
-    fi
+    echo "Download complete!"
 }
 
 pythondev() {
