@@ -299,36 +299,35 @@ function deleteinstance() {
 }
 
 
-# Function to convert a given date to ISO 8601 format
 function convert_to_iso8601() {
-    # Check if the input is provided
+    # check if input is provided
     if [[ -z "$1" ]]; then
         echo "Usage: convert_to_iso8601 <date>"
         return 1
     fi
 
-    # Function to remove ordinal suffixes (st, nd, rd, th) from day part
+    # function to remove ordinal suffixes (st, nd, rd, th) from day part
     function remove_suffix() {
         echo "$1" | sed -E 's/([0-9]+)(st|nd|rd|th)/\1/'
     }
 
-    # Preprocess input to remove ordinal suffixes
+    # preprocess input to remove ordinal suffixes
     cleaned_input=$(remove_suffix "$1")
 
-    # Attempt to convert using "Month Day" format
+    # attempt to convert using "Month Day" format
     iso_date=$(date -j -f "%B %d" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
 
-    # If the first conversion fails, attempt "Day Month" format
+    # if first conversion fails, attempt "Day Month" format
     if [[ $? -ne 0 ]]; then
         iso_date=$(date -j -f "%d %B" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
     fi
 
-    # If both previous conversions fail, attempt "dd-mm-yyyy" format
+    # if both previous conversions fail, attempt "dd-mm-yyyy" format
     if [[ $? -ne 0 ]]; then
         iso_date=$(date -j -f "%d-%m-%Y" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
     fi
 
-    # Check if any date command was successful
+    # check if any date command was successful
     if [[ $? -ne 0 ]]; then
         echo "Error: Invalid date format. Please use 'Month Day', 'Day Month', or 'dd-mm-yyyy' format (e.g., 'August 5th', '5th August', '05-08-2024')."
         return 1
@@ -337,7 +336,7 @@ function convert_to_iso8601() {
     fi
 }
 
-# GCP function with integrated date handling
+
 function gcp() {
     local date=""
     local time=""
@@ -408,7 +407,7 @@ function gcp() {
             time=$(date +"%H:%M")
         fi
         
-        # Combine date and time to ISO 8601 format
+        # combine date and time to ISO 8601 format
         date_string=$(date -j -f "%Y-%m-%d %H:%M" "${iso_date} ${time}" +"%Y-%m-%dT%H:%M:%S")
         echo "Setting GIT_AUTHOR_DATE and GIT_COMMITTER_DATE to: $date_string"
         GIT_AUTHOR_DATE="$date_string" GIT_COMMITTER_DATE="$date_string" git commit -m "$commit_message"
