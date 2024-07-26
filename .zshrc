@@ -222,18 +222,18 @@ function stopinstances {
 function startinstances {
     local instance_name="$1"
 
-    # Get the list of terminated instances
+    # get list of terminated instances
     local instances=$(gcloud compute instances list --filter="status=TERMINATED" --format="table[no-heading](name, zone)")
-    # Check if any instances are terminated
+    # check if any instances are terminated
     if [[ -z "$instances" ]]; then
         echo "No terminated instances found."
         return
     fi
-    # Convert the instances list to an array
+    # convert instances list to an array
     local instance_array=("${(@f)instances}")
 
     if [[ -n "$instance_name" ]]; then
-        # Check if the provided instance name exists in the list
+        # check if provided instance name exists in the list
         local found=false
         for instance in "${instance_array[@]}"; do
             if [[ "${instance%% *}" == "$instance_name" ]]; then
@@ -248,12 +248,12 @@ function startinstances {
             return
         fi
     else
-        # Display the list of terminated instances
+        # display list of terminated instances
         echo "Please select an instance to start:"
         for ((i = 1; i <= ${#instance_array[@]}; i++)); do
             echo "$i. ${instance_array[$i]%% *}"
         done
-        # Read user input
+        # read user input
         read -r "selection?Enter the number corresponding to the instance you want to start: "
         if [[ $selection -gt 0 && $selection -le ${#instance_array[@]} ]]; then
             # Get the selected instance details
@@ -267,14 +267,14 @@ function startinstances {
     fi
 
     echo "Starting instance: $selected_instance_name in zone: $selected_instance_zone"
-    # Run the gcloud command to start the selected instance
+    # run gcloud command to start the selected instance
     gcloud compute instances start "$selected_instance_name" --zone="$selected_instance_zone"
 
-    # Wait a bit for the instance to fully start
+    # wait a bit for instance to fully start
     echo "Waiting for instance to initialize..."
     sleep 10
 
-    # Get the external IP address
+    # get external IP address
     local external_ip=$(gcloud compute instances describe "$selected_instance_name" --zone="$selected_instance_zone" --format="get(networkInterfaces[0].accessConfigs[0].natIP)")
 
     if [[ -n "$external_ip" ]]; then
@@ -287,7 +287,7 @@ function startinstances {
 }
 
 function deleteinstance() {
-    instance_name=$1  # Assign the first positional parameter to instance_name
+    instance_name=$1  # assign first positional parameter to instance_name
 
     if [ -z "$instance_name" ]; then
         echo "Error: No instance name provided."
