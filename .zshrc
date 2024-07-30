@@ -956,6 +956,47 @@ function sox_audio() {
     echo "Conversion completed: $output_file"
 }
 
+plik_upload() {
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: plik_upload <file>"
+        return 1
+    fi
+
+    local file="$1"
+    local plik_url="http://185.44.64.170:8080"
+
+    if [[ ! -f "$file" ]]; then
+        echo "Error: File '$file' not found."
+        return 1
+    fi
+
+    # Create an upload
+    local upload_response=$(curl -s -X POST "$plik_url/upload")
+    local upload_id=$(echo "$upload_response" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
+    local upload_token=$(echo "$upload_response" | grep -o '"uploadToken":"[^"]*"' | cut -d'"' -f4)
+
+    if [[ -z "$upload_id" || -z "$upload_token" ]]; then
+        echo "Error: Failed to create upload."
+        return 1
+    fi
+
+    # Upload the file
+    local upload_result=$(curl -s -X POST \
+        -H "X-UploadToken: $upload_token" \
+        -F "file=@$file" \
+        "$plik_url/file/$upload_id")
+
+    local file_id=$(echo "$upload_result" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
+
+    if [[ -z "$file_id" ]]; then
+        echo "Error: Failed to upload file."
+        return 1
+    fi
+
+    echo "File uploaded successfully."
+    echo "Download URL: $plik_url/file/$upload_id/$file_id/$(basename "$file")"
+}
+
 source <(fzf --zsh)
 
 # zeoxide initialization and iterm2 integration
