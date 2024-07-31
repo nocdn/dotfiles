@@ -970,28 +970,15 @@ plik_upload() {
         return 1
     fi
 
-    # Create an upload
-    local upload_response=$(curl -s -X POST "$plik_url/upload")
-    local upload_id=$(echo "$upload_response" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
-    local upload_token=$(echo "$upload_response" | grep -o '"uploadToken":"[^"]*"' | cut -d'"' -f4)
+    local upload_result=$(curl --form "file=@$file" "$plik_url")
 
-    if [[ -z "$upload_id" || -z "$upload_token" ]]; then
-        echo "Error: Failed to create upload."
-        return 1
-    fi
-
-    # Upload the file
-    local upload_result=$(curl -s -X POST \
-        -H "X-UploadToken: $upload_token" \
-        -F "file=@$file" \
-        "$plik_url/file/$upload_id")
-
-    local file_id=$(echo "$upload_result" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
-
-    if [[ -z "$file_id" ]]; then
+    if [[ $? -ne 0 ]]; then
         echo "Error: Failed to upload file."
         return 1
     fi
+
+    local upload_id=$(echo "$upload_result" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
+    local file_id=$(echo "$upload_result" | grep -o '"files":\[{"id":"[^"]*"' | cut -d'"' -f4)
 
     echo "File uploaded successfully."
     echo "Download URL: $plik_url/file/$upload_id/$file_id/$(basename "$file")"
