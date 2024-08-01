@@ -976,6 +976,8 @@ plikd_upload() {
     # Replace '127.0.0.1' with '185.44.64.170' if it appears in the output
     OUTPUT=${OUTPUT//127.0.0.1/185.44.64.170}
 
+    echo "$OUTPUT" | pbcopy
+
     echo "$OUTPUT"
 }
 
