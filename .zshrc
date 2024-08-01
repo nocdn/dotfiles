@@ -956,32 +956,27 @@ function sox_audio() {
     echo "Conversion completed: $output_file"
 }
 
-plik_upload() {
-    if [[ $# -eq 0 ]]; then
-        echo "Usage: plik_upload <file>"
+plikd_upload() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: upload_file <file_path>"
         return 1
     fi
-
-    local file="$1"
-    local plik_url="http://185.44.64.170:8080"
-
-    if [[ ! -f "$file" ]]; then
-        echo "Error: File '$file' not found."
+    
+    FILE_PATH="$1"
+    
+    # Ensure the file exists
+    if [[ ! -f "$FILE_PATH" ]]; then
+        echo "Error: File '$FILE_PATH' not found!"
         return 1
     fi
+    
+    # Run the curl command and save the output
+    OUTPUT=$(curl --form "file=@$FILE_PATH" http://185.44.64.170:8080)
+    
+    # Replace '127.0.0.1' with '185.44.64.170' if it appears in the output
+    OUTPUT=${OUTPUT//127.0.0.1/185.44.64.170}
 
-    local upload_result=$(curl --form "file=@$file" "$plik_url")
-
-    if [[ $? -ne 0 ]]; then
-        echo "Error: Failed to upload file."
-        return 1
-    fi
-
-    local upload_id=$(echo "$upload_result" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
-    local file_id=$(echo "$upload_result" | grep -o '"files":\[{"id":"[^"]*"' | cut -d'"' -f4)
-
-    echo "File uploaded successfully."
-    echo "Download URL: $plik_url/file/$upload_id/$file_id/$(basename "$file")"
+    echo "$OUTPUT"
 }
 
 source <(fzf --zsh)
