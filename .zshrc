@@ -971,7 +971,7 @@ plikd_upload() {
     fi
     
     # Run the curl command and save the output
-    OUTPUT=$(curl --form "file=@$FILE_PATH" http://185.44.64.170:8080)
+    OUTPUT=$(curl -s --form "file=@$FILE_PATH" http://185.44.64.170:8080)
     
     # Replace '127.0.0.1' with '185.44.64.170' if it appears in the output
     OUTPUT=${OUTPUT//127.0.0.1/185.44.64.170}
