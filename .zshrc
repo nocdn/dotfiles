@@ -964,17 +964,18 @@ plikd_upload() {
     
     FILE_PATH="$1"
     
-    # Ensure the file exists
+    # make sure file exists
     if [[ ! -f "$FILE_PATH" ]]; then
         echo "Error: File '$FILE_PATH' not found!"
         return 1
     fi
     
-    # Run the curl command and save the output
+    # run curl command silently and save output
     OUTPUT=$(curl -s --form "file=@$FILE_PATH" http://185.44.64.170:8080)
     
-    # Replace '127.0.0.1' with '185.44.64.170' if it appears in the output
+    # replace '127.0.0.1' with '185.44.64.170' if it appears in command output
     OUTPUT=${OUTPUT//127.0.0.1/185.44.64.170}
+
 
     echo "$OUTPUT" | pbcopy
 
