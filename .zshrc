@@ -777,6 +777,39 @@ pythondev() {
     echo "Python $python_version environment '$env_name' is now active."
 }
 
+typetext() {
+    local wait_time=2  # Default wait time
+
+    # Parse options
+    while getopts ":t:" opt; do
+        case $opt in
+            t)
+                wait_time=$OPTARG
+                ;;
+            \?)
+                echo "Invalid option: -$OPTARG" >&2
+                return 1
+                ;;
+            :)
+                echo "Option -$OPTARG requires an argument." >&2
+                return 1
+                ;;
+        esac
+    done
+    shift $((OPTIND-1))
+
+    read "text_type?Text to type: "
+
+    echo "Waiting for $wait_time seconds..."
+    sleep "$wait_time"
+
+    # type the text using osascript
+    osascript -e "tell application \"System Events\" to keystroke \"$text_type\""
+}
+
+# Example usage:
+# typetext -t 5
+
 source <(fzf --zsh)
 
 # zeoxide initialization and iterm2 integration
