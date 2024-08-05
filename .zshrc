@@ -336,6 +336,26 @@ function convert_to_iso8601() {
     fi
 }
 
+function convert_to_iso8601_llm() {
+  local input_date="$1"
+  curl https://api.openai.com/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $OPENAI_API_KEY" \
+    -d "{
+      \"model\": \"gpt-4o-mini\",
+      \"messages\": [
+        {
+          \"role\": \"system\",
+          \"content\": \"You convert dates given in natural language into iso8601 format. Output just the date in iso8601 format. The current date is 6th August 2024.\"
+        },
+        {
+          \"role\": \"user\",
+          \"content\": \"$input_date\"
+        }
+      ]
+    }" | jq -r '.choices[0].message.content'
+}
+
 
 function gcp() {
     local date=""
@@ -394,7 +414,7 @@ function gcp() {
     if [[ -n "$date" || -n "$time" ]]; then
         if [[ -n "$date" ]]; then
             # Convert the provided date using the convert_to_iso8601 function
-            iso_date=$(convert_to_iso8601 "$date")
+            iso_date=$(convert_to_iso8601_llm "$date")
             if [[ $? -ne 0 ]]; then
                 echo "Error: Unable to parse the date '$date'."
                 return 1
