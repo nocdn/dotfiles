@@ -348,7 +348,9 @@ function gcp() {
     fi
 
     git add .
-    read -r -p "Commit message: " commit_message
+
+    echo -n "Commit message: "
+    read commit_message
 
     # Prepare the date string
     if [[ -n "$date" || -n "$time" ]]; then
@@ -358,8 +360,8 @@ function gcp() {
         if [[ -z "$time" ]]; then
             time=$(date +"%H:%M")
         fi
-        # Convert date and time to ISO 8601 format
-        date_string=$(date -d "${date} ${time}" +"%Y-%m-%dT%H:%M:%S")
+        # Convert date and time to ISO 8601 format (compatible with macOS)
+        date_string=$(date -jf "%d-%m-%y %H:%M" "${date} ${time}" +"%Y-%m-%dT%H:%M:%S")
         echo "Setting GIT_AUTHOR_DATE and GIT_COMMITTER_DATE to: $date_string"
         GIT_AUTHOR_DATE="$date_string" GIT_COMMITTER_DATE="$date_string" git commit -m "$commit_message"
     else
@@ -368,8 +370,6 @@ function gcp() {
 
     # Push the changes
     git push
-
-    echo "Git commit and push complete!"
 }
 
 upload() {
