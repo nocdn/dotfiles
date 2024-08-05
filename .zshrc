@@ -304,7 +304,7 @@ function gcp() {
     local time=""
     local help=false
 
-    # Parse command line arguments
+    # parse command line arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
             -d|--date)
@@ -325,7 +325,7 @@ function gcp() {
         esac
     done
 
-    # Check for help flag
+    # check for help flag
     if [[ "$help" == true ]]; then
         echo -e "\nUsage: gcp [-d|--date <dd-mm-yy>] [-t|--time <hh:mm>] [--help]"
         echo
@@ -352,7 +352,7 @@ function gcp() {
     echo -n "Commit message: "
     read commit_message
 
-    # Prepare the date string
+    # prepare date string
     if [[ -n "$date" || -n "$time" ]]; then
         if [[ -z "$date" ]]; then
             date=$(date +"%d-%m-%y")
@@ -360,7 +360,7 @@ function gcp() {
         if [[ -z "$time" ]]; then
             time=$(date +"%H:%M")
         fi
-        # Convert date and time to ISO 8601 format (compatible with macOS)
+        # convert date and time to ISO 8601
         date_string=$(date -jf "%d-%m-%y %H:%M" "${date} ${time}" +"%Y-%m-%dT%H:%M:%S")
         echo "Setting GIT_AUTHOR_DATE and GIT_COMMITTER_DATE to: $date_string"
         GIT_AUTHOR_DATE="$date_string" GIT_COMMITTER_DATE="$date_string" git commit -m "$commit_message"
@@ -368,7 +368,7 @@ function gcp() {
         git commit -m "$commit_message"
     fi
 
-    # Push the changes
+    # push changes
     git push
 }
 
