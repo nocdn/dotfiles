@@ -300,9 +300,67 @@ function deleteinstance() {
 
 
 function gcp() {
+    local date=""
+    local time=""
+    local help=false
+
+    # Parse command line arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -d|--date)
+                date="$2"
+                shift 2
+                ;;
+            -t|--time)
+                time="$2"
+                shift 2
+                ;;
+            --help)
+                help=true
+                shift
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+
+    # Check for help flag
+    if [[ "$help" == true ]]; then
+        echo "\nUsage: gcp [-d|--date <dd-mm-yy>] [-t|--time <hh:mm>] [--help]"
+        echo
+        echo "Description:"
+        echo "  Stages all changes, commits with a message, and pushes to the remote repository."
+        echo "  Optionally allows setting a custom date and time for the commit."
+        echo
+        echo "Options:"
+        echo "  -d, --date <dd-mm-yy>    Set a custom date for the commit"
+        echo "  -t, --time <hh:mm>       Set a custom time for the commit"
+        echo "  --help                   Display this help message"
+        echo
+        echo "Details:"
+        echo "  - If no date is provided, the current date is used"
+        echo "  - If no time is provided, the current time is used"
+        echo "  - Date format: dd-mm-yy (e.g., 01-01-23)"
+        echo "  - Time format: hh:mm (e.g., 14:30)"
+        echo "  - The commit message is prompted interactively\n"
+        return 0
+    fi
+
     ga .
     read -r "commit_message?Commit message: "
-    git commit -m "$commit_message"
+
+    # Prepare the date string
+    if [[ -n "$date" ]]; then
+        if [[ -z "$time" ]]; then
+            time=$(date +"%H:%M")
+        fi
+        date_string="${date}T${time}"
+        GIT_AUTHOR_DATE="$date_string" GIT_COMMITTER_DATE="$date_string" git commit -m "$commit_message"
+    else
+        git commit -m "$commit_message"
+    fi
+
     git push
 }
 
@@ -723,7 +781,6 @@ ytdl() {
         fi
         quality_option=""
     fi
-
     echo "Downloading ${type}..."
 
     yt-dlp \
