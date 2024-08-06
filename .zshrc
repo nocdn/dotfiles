@@ -368,6 +368,8 @@ function gcp() {
 
     # Push the changes
     git push
+
+    echo "Git commit and push complete!"
 }
 
 upload() {
