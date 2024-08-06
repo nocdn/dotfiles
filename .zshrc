@@ -327,7 +327,7 @@ function gcp() {
 
     # Check for help flag
     if [[ "$help" == true ]]; then
-        echo "\nUsage: gcp [-d|--date <dd-mm-yy>] [-t|--time <hh:mm>] [--help]"
+        echo -e "\nUsage: gcp [-d|--date <dd-mm-yy>] [-t|--time <hh:mm>] [--help]"
         echo
         echo "Description:"
         echo "  Stages all changes, commits with a message, and pushes to the remote repository."
@@ -347,15 +347,18 @@ function gcp() {
         return 0
     fi
 
-    ga .
-    read -r "commit_message?Commit message: "
+    git add .
+    read -r -p "Commit message: " commit_message
 
     # Prepare the date string
-    if [[ -n "$date" ]]; then
+    if [[ -n "$date" || -n "$time" ]]; then
+        if [[ -z "$date" ]]; then
+            date=$(date +"%d-%m-%y")
+        fi
         if [[ -z "$time" ]]; then
             time=$(date +"%H:%M")
         fi
-        date_string="${date}T${time}"
+        date_string=$(date -d "${date} ${time}" +"%Y-%m-%dT%H:%M:%S")
         GIT_AUTHOR_DATE="$date_string" GIT_COMMITTER_DATE="$date_string" git commit -m "$commit_message"
     else
         git commit -m "$commit_message"
