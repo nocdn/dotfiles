@@ -872,8 +872,38 @@ typetext() {
     osascript -e "tell application \"System Events\" to keystroke \"$text_type\""
 }
 
-# Example usage:
-# typetext -t 5
+# Function to convert a given date to ISO 8601 format
+function convert_to_iso8601() {
+    # Check if the input is provided
+    if [[ -z "$1" ]]; then
+        echo "Usage: convert_to_iso8601 <date>"
+        return 1
+    fi
+
+    # Function to remove ordinal suffixes (st, nd, rd, th) from day part
+    function remove_suffix() {
+        echo "$1" | sed -E 's/([0-9]+)(st|nd|rd|th)/\1/'
+    }
+
+    # Preprocess input to remove ordinal suffixes
+    cleaned_input=$(remove_suffix "$1")
+
+    # Attempt to convert using "Month Day" format
+    iso_date=$(date -j -f "%B %d" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
+
+    # If the first conversion fails, attempt "Day Month" format
+    if [[ $? -ne 0 ]]; then
+        iso_date=$(date -j -f "%d %B" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
+    fi
+
+    # Check if either date command was successful
+    if [[ $? -ne 0 ]]; then
+        echo "Error: Invalid date format. Please use 'Month Day' or 'Day Month' format (e.g., 'August 5th' or '5th August')."
+        return 1
+    else
+        echo "$iso_date"
+    fi
+}
 
 source <(fzf --zsh)
 
