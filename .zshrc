@@ -358,12 +358,15 @@ function gcp() {
         if [[ -z "$time" ]]; then
             time=$(date +"%H:%M")
         fi
+        # Convert date and time to ISO 8601 format
         date_string=$(date -d "${date} ${time}" +"%Y-%m-%dT%H:%M:%S")
+        echo "Setting GIT_AUTHOR_DATE and GIT_COMMITTER_DATE to: $date_string"
         GIT_AUTHOR_DATE="$date_string" GIT_COMMITTER_DATE="$date_string" git commit -m "$commit_message"
     else
         git commit -m "$commit_message"
     fi
 
+    # Push the changes
     git push
 }
 
