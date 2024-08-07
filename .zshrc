@@ -58,8 +58,8 @@ alias hist="cat .zsh_history | fzf | pbcopy"
 
 alias fcat="fzf | xargs cat"
 alias ls="eza"
-alias la="eza -l --no-permissions --no-user --no-filesize"
-alias laa="eza -la --no-permissions --no-user --no-filesize"
+alias la="eza -l --no-permissions --no-user --no-filesize --sort=date"
+alias laa="eza -la --no-permissions --no-user --no-filesize --sort=date"
 
 alias gs='git status'
 alias ga='git add'
@@ -299,42 +299,42 @@ function deleteinstance() {
 }
 
 
-function convert_to_iso8601() {
-    # check if input is provided
-    if [[ -z "$1" ]]; then
-        echo "Usage: convert_to_iso8601 <date>"
-        return 1
-    fi
+# function convert_to_iso8601() {
+#     # check if input is provided
+#     if [[ -z "$1" ]]; then
+#         echo "Usage: convert_to_iso8601 <date>"
+#         return 1
+#     fi
 
-    # function to remove ordinal suffixes (st, nd, rd, th) from day part
-    function remove_suffix() {
-        echo "$1" | sed -E 's/([0-9]+)(st|nd|rd|th)/\1/'
-    }
+#     # function to remove ordinal suffixes (st, nd, rd, th) from day part
+#     function remove_suffix() {
+#         echo "$1" | sed -E 's/([0-9]+)(st|nd|rd|th)/\1/'
+#     }
 
-    # preprocess input to remove ordinal suffixes
-    cleaned_input=$(remove_suffix "$1")
+#     # preprocess input to remove ordinal suffixes
+#     cleaned_input=$(remove_suffix "$1")
 
-    # attempt to convert using "Month Day" format
-    iso_date=$(date -j -f "%B %d" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
+#     # attempt to convert using "Month Day" format
+#     iso_date=$(date -j -f "%B %d" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
 
-    # if first conversion fails, attempt "Day Month" format
-    if [[ $? -ne 0 ]]; then
-        iso_date=$(date -j -f "%d %B" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
-    fi
+#     # if first conversion fails, attempt "Day Month" format
+#     if [[ $? -ne 0 ]]; then
+#         iso_date=$(date -j -f "%d %B" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
+#     fi
 
-    # if both previous conversions fail, attempt "dd-mm-yyyy" format
-    if [[ $? -ne 0 ]]; then
-        iso_date=$(date -j -f "%d-%m-%Y" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
-    fi
+#     # if both previous conversions fail, attempt "dd-mm-yyyy" format
+#     if [[ $? -ne 0 ]]; then
+#         iso_date=$(date -j -f "%d-%m-%Y" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
+#     fi
 
-    # check if any date command was successful
-    if [[ $? -ne 0 ]]; then
-        echo "Error: Invalid date format. Please use 'Month Day', 'Day Month', or 'dd-mm-yyyy' format (e.g., 'August 5th', '5th August', '05-08-2024')."
-        return 1
-    else
-        echo "$iso_date"
-    fi
-}
+#     # check if any date command was successful
+#     if [[ $? -ne 0 ]]; then
+#         echo "Error: Invalid date format. Please use 'Month Day', 'Day Month', or 'dd-mm-yyyy' format (e.g., 'August 5th', '5th August', '05-08-2024')."
+#         return 1
+#     else
+#         echo "$iso_date"
+#     fi
+# }
 
 function convert_to_iso8601_llm() {
   local input_date="$1"
