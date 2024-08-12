@@ -12,7 +12,6 @@ vim.cmd("set softtabstop=2")
 -- defines number of spaces used for each level of indentation
 vim.cmd("set shiftwidth=2")
 
-
 -- lazy.nvim package manager
 
 -- Bootstrap lazy.nvim
@@ -88,6 +87,9 @@ configs.setup({
   indent = { enable = true },  
 })
 
+config = function()
+  require("supermaven-nvim").setup({})
+end
 
 vim.keymap.set('n', '<leader>n', ':Neotree filesystem reveal left<CR>')
 
