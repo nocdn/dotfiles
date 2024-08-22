@@ -948,7 +948,9 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 
 source ~/.zsh_secrets
 
-# syntax highlighting
 
+. "$HOME/.cargo/env"
+
+# syntax highlighting
 source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
