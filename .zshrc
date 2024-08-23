@@ -338,7 +338,7 @@ function deleteinstance() {
 
 function convert_to_iso8601_llm() {
   local input_date="$1"
-  curl https://api.openai.com/v1/chat/completions \
+  curl -s https://api.openai.com/v1/chat/completions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $OPENAI_API_KEY" \
     -d "{
