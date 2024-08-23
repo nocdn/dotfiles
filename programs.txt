@@ -28,3 +28,9 @@ https://dropoverapp.com/
 https://www.roeybiran.com/apps/finbar
 
 https://apps.apple.com/us/app/command-x/id6448461551
+
+https://github.com/TheR1D/shell_gpt
+
+https://github.com/charmbracelet/gum
+
+https://github.com/Silejonu/bash_loading_animations?tab=readme-ov-file
