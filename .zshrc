@@ -129,7 +129,7 @@ function tempinstance() {
     )
 
     # Use fzf to select instance type
-    local selected_type=$(printf "%s\n" "${instance_types[@]}" | fzf --height=7 --prompt="Select an instance type: ")
+    local selected_type=$(printf "%s\n" "${instance_types[@]}" | fzf --height=6 --prompt="Select an instance type: ")
 
     if [[ -z "$selected_type" ]]; then
         echo "No instance type selected. Exiting."
@@ -139,7 +139,7 @@ function tempinstance() {
     echo "You selected: $selected_type"
 
     # Use fzf to select disk type with correct options
-    local disk_type=$(echo -e "pd-balanced\npd-standard\npd-ssd" | fzf --height=6 --prompt="Select disk type: ")
+    local disk_type=$(echo -e "pd-balanced\npd-standard\npd-ssd" | fzf --height=5 --prompt="Select disk type: ")
 
     if [[ -z "$disk_type" ]]; then
         echo "No disk type selected. Exiting."
@@ -147,6 +147,13 @@ function tempinstance() {
     fi
 
     echo "You selected disk type: $disk_type"
+
+    # Prompt for custom disk size
+    echo -n "Enter disk size in GB (default is 10GB): "
+    read disk_size
+    disk_size=${disk_size:-10}
+
+    echo "Disk size set to: ${disk_size}GB"
 
     # Define the path to the SSH key file
     local ssh_key_file=~/latest-server-ssh-key.pub
@@ -160,15 +167,18 @@ function tempinstance() {
         return 1
     fi
 
-    # Run the gcloud command with the selected instance type and disk type
+    # Run the gcloud command with the selected instance type, disk type, and size
     gcloud compute instances create testing-instance \
         --zone=europe-west2-a \
         --machine-type=$selected_type \
         --boot-disk-type=$disk_type \
+        --boot-disk-size=${disk_size}GB \
         --preemptible \
         --tags=minecraft,http-server,https-server \
         --scopes=https://www.googleapis.com/auth/cloud-platform \
         --metadata ssh-keys="nk3h8wbq:$ssh_key"
+
+    gcloud compute ssh testing-instance --zone=europe-west2-a
 }
 
 function stopinstances {
