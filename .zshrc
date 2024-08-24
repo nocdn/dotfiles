@@ -338,6 +338,9 @@ function deleteinstance() {
 
 function convert_to_iso8601_llm() {
   local input_date="$1"
+  # Get the current date in iso8601 format
+  local current_date=$(date -I) # This gets the current date in YYYY-MM-DD format
+
   curl -s https://api.openai.com/v1/chat/completions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $OPENAI_API_KEY" \
@@ -346,7 +349,7 @@ function convert_to_iso8601_llm() {
       \"messages\": [
         {
           \"role\": \"system\",
-          \"content\": \"You convert dates given in natural language into iso8601 format. Output just the date in iso8601 format. The current date is 6th August 2024.\"
+          \"content\": \"You convert dates given in natural language into iso8601 format. Output just the date in iso8601 format. The current date is $current_date.\"
         },
         {
           \"role\": \"user\",
