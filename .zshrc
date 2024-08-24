@@ -70,7 +70,7 @@ alias mv='mv -iv'
 alias cl='clear'
 alias ipinfo='curl -s http://ip-api.com/json/ | jq "."'
 
-export EDITOR=/usr/bin/nano
+export EDITOR=/opt/homebrew/bin/nvim
 
 autoload -z edit-command-line
 zle -N edit-command-line
