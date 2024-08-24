@@ -1,0 +1,37 @@
+2024-07-22 22:22:56,430 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-07-22 22:22:56,441 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances']
+2024-07-22 22:22:56,447 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances', 'list']
+2024-07-22 22:22:56,448 DEBUG    root            Running [gcloud.compute.instances.list] with arguments: [--filter: "status=RUNNING", --format: "table[no-heading](name, zone)"]
+2024-07-22 22:22:56,548 DEBUG    google.auth.transport.requests Making request: POST https://oauth2.googleapis.com/token
+2024-07-22 22:22:56,616 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): oauth2.googleapis.com:443
+2024-07-22 22:22:56,836 DEBUG    urllib3.connectionpool https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None
+2024-07-22 22:22:56,933 INFO     root            client_filter=None server_filter='status eq RUNNING'
+2024-07-22 22:22:56,934 DEBUG    root            Chosen display Format:    table(
+      name,
+      zone.basename(),
+      machineType.machine_type().basename(),
+      scheduling.preemptible.yesno(yes=true, no=''),
+      networkInterfaces[].networkIP.notnull().list():label=INTERNAL_IP,
+      networkInterfaces[].accessConfigs[0].natIP.notnull().list()      :label=EXTERNAL_IP,
+      status
+    ) table[no-heading](name, zone)
+2024-07-22 22:22:56,934 INFO     root            Display format: "    table(
+      name,
+      zone.basename(),
+      machineType.machine_type().basename(),
+      scheduling.preemptible.yesno(yes=true, no=''),
+      networkInterfaces[].networkIP.notnull().list():label=INTERNAL_IP,
+      networkInterfaces[].accessConfigs[0].natIP.notnull().list()      :label=EXTERNAL_IP,
+      status
+    ) table[no-heading](name, zone)"
+2024-07-22 22:22:57,019 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-07-22 22:22:57,635 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/aggregated/instances?alt=json&includeAllScopes=True&maxResults=500&returnPartialSuccess=True HTTP/1.1" 200 None
+2024-07-22 22:22:57,698 INFO     ___FILE_ONLY___ vanilla-server
+2024-07-22 22:22:57,698 INFO     ___FILE_ONLY___   
+2024-07-22 22:22:57,698 INFO     ___FILE_ONLY___ europe-west9-c
+2024-07-22 22:22:57,698 INFO     ___FILE_ONLY___ 
+
+2024-07-22 22:22:57,699 DEBUG    root            Checking for updates...
+2024-07-22 22:22:57,763 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): dl.google.com:443
+2024-07-22 22:22:58,122 DEBUG    urllib3.connectionpool https://dl.google.com:443 "GET /dl/cloudsdk/channels/rapid/components-2.json HTTP/1.1" 200 223375
+2024-07-22 22:22:58,277 DEBUG    root            Metrics reporting process started...

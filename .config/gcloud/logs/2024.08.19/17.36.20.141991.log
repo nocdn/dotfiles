@@ -1,0 +1,50 @@
+2024-08-19 17:36:20,152 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-08-19 17:36:20,153 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances']
+2024-08-19 17:36:20,157 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances', 'delete']
+2024-08-19 17:36:20,158 DEBUG    root            Running [gcloud.compute.instances.delete] with arguments: [INSTANCE_NAMES:1: "['testing-instance']"]
+2024-08-19 17:36:20,263 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-19 17:36:21,042 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/aggregated/instances?alt=json&filter=name+eq+%5Etesting-instance%24&maxResults=500 HTTP/1.1" 200 None
+2024-08-19 17:36:21,071 INFO     ___FILE_ONLY___ No zone specified. Using zone [europe-west2-a] for instance: [testing-instance].
+
+2024-08-19 17:36:21,072 DEBUG    root            Chosen display Format:list[title="The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.",always-display-title]
+2024-08-19 17:37:28,666 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-19 17:37:29,241 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "DELETE /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance?alt=json HTTP/1.1" 200 None
+2024-08-19 17:37:29,247 DEBUG    root            Operations to inspect: [(<Operation
+ id: 5134068999514933798
+ insertTime: '2024-08-19T09:37:29.066-07:00'
+ kind: 'compute#operation'
+ name: 'operation-1724085448848-6200becbdb349-df9b005e-9b531354'
+ operationType: 'delete'
+ progress: 0
+ selfLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724085448848-6200becbdb349-df9b005e-9b531354'
+ startTime: '2024-08-19T09:37:29.079-07:00'
+ status: StatusValueValuesEnum(RUNNING, 2)
+ targetId: 376195866428361947
+ targetLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance'
+ user: 'NK3H8WBQ@gmail.com'
+ warnings: []
+ zone: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a'>, 3)]
+2024-08-19 17:37:29,252 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-19 17:38:14,909 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724085448848-6200becbdb349-df9b005e-9b531354/wait?alt=json HTTP/1.1" 200 None
+2024-08-19 17:38:14,915 DEBUG    root            Operations to inspect: [(<Operation
+ endTime: '2024-08-19T09:38:14.830-07:00'
+ id: 5134068999514933798
+ insertTime: '2024-08-19T09:37:29.066-07:00'
+ kind: 'compute#operation'
+ name: 'operation-1724085448848-6200becbdb349-df9b005e-9b531354'
+ operationType: 'delete'
+ progress: 100
+ selfLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724085448848-6200becbdb349-df9b005e-9b531354'
+ startTime: '2024-08-19T09:37:29.079-07:00'
+ status: StatusValueValuesEnum(DONE, 0)
+ targetId: 376195866428361947
+ targetLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance'
+ user: 'NK3H8WBQ@gmail.com'
+ warnings: []
+ zone: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a'>, 3)]
+2024-08-19 17:38:14,915 INFO     ___FILE_ONLY___ Deleted [https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance].
+
+2024-08-19 17:38:14,915 DEBUG    root            Chosen display Format:none
+2024-08-19 17:38:14,916 INFO     root            Display format: "none"
+2024-08-19 17:38:14,919 INFO     root            cache collection=compute.instances api_version=v1 params=['project', 'zone', 'instance']
+2024-08-19 17:38:14,954 DEBUG    root            Metrics reporting process started...

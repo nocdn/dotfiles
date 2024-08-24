@@ -1,0 +1,53 @@
+2024-08-14 17:25:05,416 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-08-14 17:25:05,418 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances']
+2024-08-14 17:25:05,423 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances', 'delete']
+2024-08-14 17:25:05,424 DEBUG    root            Running [gcloud.compute.instances.delete] with arguments: [INSTANCE_NAMES:1: "['testing-instance']"]
+2024-08-14 17:25:05,445 DEBUG    google.auth.transport.requests Making request: POST https://oauth2.googleapis.com/token
+2024-08-14 17:25:05,464 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): oauth2.googleapis.com:443
+2024-08-14 17:25:05,606 DEBUG    urllib3.connectionpool https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None
+2024-08-14 17:25:05,716 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-14 17:25:06,589 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/aggregated/instances?alt=json&filter=name+eq+%5Etesting-instance%24&maxResults=500 HTTP/1.1" 200 None
+2024-08-14 17:25:06,629 INFO     ___FILE_ONLY___ No zone specified. Using zone [europe-west2-a] for instance: [testing-instance].
+
+2024-08-14 17:25:06,630 DEBUG    root            Chosen display Format:list[title="The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.",always-display-title]
+2024-08-14 17:25:07,743 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-14 17:25:08,197 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "DELETE /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance?alt=json HTTP/1.1" 200 None
+2024-08-14 17:25:08,203 DEBUG    root            Operations to inspect: [(<Operation
+ id: 8196909928901862539
+ insertTime: '2024-08-14T09:25:08.172-07:00'
+ kind: 'compute#operation'
+ name: 'operation-1723652707928-61fa72b5f49f1-2ffd30bb-2ebe358b'
+ operationType: 'delete'
+ progress: 0
+ selfLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1723652707928-61fa72b5f49f1-2ffd30bb-2ebe358b'
+ startTime: '2024-08-14T09:25:08.184-07:00'
+ status: StatusValueValuesEnum(RUNNING, 2)
+ targetId: 6972618433046345031
+ targetLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance'
+ user: 'NK3H8WBQ@gmail.com'
+ warnings: []
+ zone: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a'>, 3)]
+2024-08-14 17:25:08,210 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-14 17:25:53,703 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1723652707928-61fa72b5f49f1-2ffd30bb-2ebe358b/wait?alt=json HTTP/1.1" 200 None
+2024-08-14 17:25:53,708 DEBUG    root            Operations to inspect: [(<Operation
+ endTime: '2024-08-14T09:25:53.672-07:00'
+ id: 8196909928901862539
+ insertTime: '2024-08-14T09:25:08.172-07:00'
+ kind: 'compute#operation'
+ name: 'operation-1723652707928-61fa72b5f49f1-2ffd30bb-2ebe358b'
+ operationType: 'delete'
+ progress: 100
+ selfLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1723652707928-61fa72b5f49f1-2ffd30bb-2ebe358b'
+ startTime: '2024-08-14T09:25:08.184-07:00'
+ status: StatusValueValuesEnum(DONE, 0)
+ targetId: 6972618433046345031
+ targetLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance'
+ user: 'NK3H8WBQ@gmail.com'
+ warnings: []
+ zone: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a'>, 3)]
+2024-08-14 17:25:53,709 INFO     ___FILE_ONLY___ Deleted [https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance].
+
+2024-08-14 17:25:53,709 DEBUG    root            Chosen display Format:none
+2024-08-14 17:25:53,710 INFO     root            Display format: "none"
+2024-08-14 17:25:53,715 INFO     root            cache collection=compute.instances api_version=v1 params=['project', 'zone', 'instance']
+2024-08-14 17:25:53,763 DEBUG    root            Metrics reporting process started...
