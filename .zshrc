@@ -128,43 +128,47 @@ function tempinstance() {
         "t2d-standard-8"
     )
 
-    # Display the list of instance types
-    echo "Please select an instance type:"
-    for ((i = 1; i <= ${#instance_types[@]}; i++)); do
-        echo "$((i)). ${instance_types[$i]}"
-    done
+    # Use fzf to select instance type
+    local selected_type=$(printf "%s\n" "${instance_types[@]}" | fzf --height=7 --prompt="Select an instance type: ")
 
-    # Read user input
-    read -r "selection?Enter the number corresponding to the instance type: "
-
-    if [[ $selection -gt 0 && $selection -le ${#instance_types[@]} ]]; then
-        # Subtract 1 from the selection to get the correct array index
-        local selected_type=${instance_types[$((selection))]}
-        echo "You selected: $selected_type"
-
-        # Define the path to the SSH key file
-        local ssh_key_file=~/latest-server-ssh-key.pub
-
-        # Read the SSH key from the file
-        if [[ -f $ssh_key_file ]]; then
-            local ssh_key
-            ssh_key=$(<"$ssh_key_file")
-        else
-            echo "SSH key file $ssh_key_file not found."
-            return 1
-        fi
-
-        # Run the gcloud command with the selected instance type
-        gcloud compute instances create testing-instance \
-            --zone=europe-west2-a \
-            --machine-type=$selected_type \
-            --preemptible \
-            --tags=minecraft,http-server,https-server \
-            --scopes=https://www.googleapis.com/auth/cloud-platform \
-            --metadata ssh-keys="nk3h8wbq:$ssh_key"
-    else
-        echo "Invalid selection. Please try again."
+    if [[ -z "$selected_type" ]]; then
+        echo "No instance type selected. Exiting."
+        return 1
     fi
+
+    echo "You selected: $selected_type"
+
+    # Use fzf to select disk type with correct options
+    local disk_type=$(echo -e "pd-balanced\npd-standard\npd-ssd" | fzf --height=6 --prompt="Select disk type: ")
+
+    if [[ -z "$disk_type" ]]; then
+        echo "No disk type selected. Exiting."
+        return 1
+    fi
+
+    echo "You selected disk type: $disk_type"
+
+    # Define the path to the SSH key file
+    local ssh_key_file=~/latest-server-ssh-key.pub
+
+    # Read the SSH key from the file
+    if [[ -f $ssh_key_file ]]; then
+        local ssh_key
+        ssh_key=$(<"$ssh_key_file")
+    else
+        echo "SSH key file $ssh_key_file not found."
+        return 1
+    fi
+
+    # Run the gcloud command with the selected instance type and disk type
+    gcloud compute instances create testing-instance \
+        --zone=europe-west2-a \
+        --machine-type=$selected_type \
+        --boot-disk-type=$disk_type \
+        --preemptible \
+        --tags=minecraft,http-server,https-server \
+        --scopes=https://www.googleapis.com/auth/cloud-platform \
+        --metadata ssh-keys="nk3h8wbq:$ssh_key"
 }
 
 function stopinstances {
