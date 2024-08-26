@@ -174,11 +174,13 @@ function tempinstance() {
         --boot-disk-type=$disk_type \
         --boot-disk-size=${disk_size}GB \
         --preemptible \
-        --tags=minecraft,http-server,https-server \
+        --tags=testing,minecraft,http-server,https-server \
         --scopes=https://www.googleapis.com/auth/cloud-platform \
         --metadata ssh-keys="nk3h8wbq:$ssh_key"
 
     gcloud compute ssh testing-instance --zone=europe-west2-a
+
+    echo "gcloud compute ssh testing-instance --zone=europe-west2-a" | pbcopy
 }
 
 function stopinstances {
