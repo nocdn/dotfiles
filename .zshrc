@@ -26,7 +26,7 @@ export PATH=~/.npm-global/bin:$PATH
 export PATH="/Users/bartek/.local/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
 
-# from https://peterlyons.com/problog/2018/01/zsh-lazy-loading/ 
+# from https://peterlyons.com/problog/2018/01/zsh-lazy-loading/
 # placeholder nvm shell function
 # On first use, it will set nvm up properly which will replace the `nvm`
 # shell function with the real one
@@ -315,43 +315,6 @@ function deleteinstance() {
 }
 
 
-# function convert_to_iso8601() {
-#     # check if input is provided
-#     if [[ -z "$1" ]]; then
-#         echo "Usage: convert_to_iso8601 <date>"
-#         return 1
-#     fi
-
-#     # function to remove ordinal suffixes (st, nd, rd, th) from day part
-#     function remove_suffix() {
-#         echo "$1" | sed -E 's/([0-9]+)(st|nd|rd|th)/\1/'
-#     }
-
-#     # preprocess input to remove ordinal suffixes
-#     cleaned_input=$(remove_suffix "$1")
-
-#     # attempt to convert using "Month Day" format
-#     iso_date=$(date -j -f "%B %d" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
-
-#     # if first conversion fails, attempt "Day Month" format
-#     if [[ $? -ne 0 ]]; then
-#         iso_date=$(date -j -f "%d %B" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
-#     fi
-
-#     # if both previous conversions fail, attempt "dd-mm-yyyy" format
-#     if [[ $? -ne 0 ]]; then
-#         iso_date=$(date -j -f "%d-%m-%Y" "$cleaned_input" +"%Y-%m-%d" 2>/dev/null)
-#     fi
-
-#     # check if any date command was successful
-#     if [[ $? -ne 0 ]]; then
-#         echo "Error: Invalid date format. Please use 'Month Day', 'Day Month', or 'dd-mm-yyyy' format (e.g., 'August 5th', '5th August', '05-08-2024')."
-#         return 1
-#     else
-#         echo "$iso_date"
-#     fi
-# }
-
 function convert_to_iso8601_llm() {
   local input_date="$1"
   # Get the current date in iso8601 format
@@ -441,11 +404,11 @@ function gcp() {
         else
             iso_date=$(date +"%Y-%m-%d")
         fi
-        
+
         if [[ -z "$time" ]]; then
             time=$(date +"%H:%M")
         fi
-        
+
         # combine date and time to ISO 8601 format
         date_string=$(date -j -f "%Y-%m-%d %H:%M" "${iso_date} ${time}" +"%Y-%m-%dT%H:%M:%S")
         echo "Setting GIT_AUTHOR_DATE and GIT_COMMITTER_DATE to: $date_string"
@@ -461,7 +424,7 @@ function gcp() {
 upload() {
     local short=false
     local file_path=""
-    
+
     # Check for help flag
     if [[ "$1" == "--help" ]]; then
         echo "\nUsage: upload [-s|--short] <file_path>"
@@ -513,7 +476,7 @@ upload() {
     echo "$upload_url"
     # copy upload URL to clipboard
     echo "$upload_url" | pbcopy
-    
+
     # do URL shortening if -s or --short flag passed
     if $short; then
         local short_url=$(curl -s "https://is.gd/create.php?format=simple&url=$upload_url")
@@ -637,7 +600,7 @@ function compressAudio() {
     fi
 
     input_file="$1"
-    
+
     # ask for parameters
     read "bitrate?enter bitrate (default: 16k): "
     read "sample_rate?enter sample rate (default: 16000): "
@@ -831,7 +794,7 @@ function combine() {
     while IFS= read -r file; do
         # get relative path
         local rel_path="${file#$dir/}"
-        
+
         # add formatted header and file contents to output
         output+="# $rel_path contents:\n\n"
         output+="$(cat "$file")\n\n\n"
