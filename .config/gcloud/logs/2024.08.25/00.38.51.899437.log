@@ -1,0 +1,106 @@
+2024-08-25 00:38:51,909 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-08-25 00:38:51,911 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances']
+2024-08-25 00:38:52,059 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances', 'create']
+2024-08-25 00:38:52,126 DEBUG    root            Running [gcloud.compute.instances.create] with arguments: [--boot-disk-size: "21474836480", --boot-disk-type: "pd-balanced", --machine-type: "t2d-standard-1", --metadata: "OrderedDict({'ssh-keys': 'nk3h8wbq:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDsKcw1zJdCT55sgYY1vGdaj+W5F1Uln/XUsSi8lXUe106diYQN0vVjVbpqbV/P8YEE3Oetvfcftmv+3ywxAbPjD/bLzIonfgdniw47uPGc46dbdmAcVhXlIoHz2eRipJhA1PzhgpKzouU3oQkPNsj8BKnCK1AkeIo5Z1fLTcQiPEG0zfMTBZ7gxb9+qJnz+i03b/j7GAk3wHgFSICZVekGejYdlESX/S4NWTJ2DOnWMRMUx87cQODRQ+4YZmAiyRKS2vWnwbOrAhm8VAv+4cEvHy8wg5d1o8bqBhQZ3CwuTcSc56/bin1WrBWva+43jgDYUPc9SOTPFVqN/utCb9pZ nk3h8wbq'})", --preemptible: "True", --scopes: "['https://www.googleapis.com/auth/cloud-platform']", --tags: "['minecraft', 'http-server', 'https-server']", --zone: "europe-west2-a", INSTANCE_NAMES:1: "['testing-instance']"]
+2024-08-25 00:38:52,147 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-25 00:38:52,739 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/zones/europe-west2-a?alt=json HTTP/1.1" 200 None
+2024-08-25 00:38:52,752 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-25 00:38:54,001 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances?alt=json HTTP/1.1" 200 None
+2024-08-25 00:38:54,006 DEBUG    root            Operations to inspect: [(<Operation
+ id: 8858901862534336994
+ insertTime: '2024-08-24T16:38:53.893-07:00'
+ kind: 'compute#operation'
+ name: 'operation-1724542732970-6207664ffaa59-d23dbe3c-22fb9981'
+ operationType: 'insert'
+ progress: 0
+ selfLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724542732970-6207664ffaa59-d23dbe3c-22fb9981'
+ startTime: '2024-08-24T16:38:53.893-07:00'
+ status: StatusValueValuesEnum(RUNNING, 2)
+ targetId: 7567186127525237218
+ targetLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance'
+ user: 'NK3H8WBQ@gmail.com'
+ warnings: []
+ zone: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a'>, 3)]
+2024-08-25 00:38:54,010 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-25 00:39:00,659 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724542732970-6207664ffaa59-d23dbe3c-22fb9981/wait?alt=json HTTP/1.1" 200 None
+2024-08-25 00:39:00,666 DEBUG    root            Operations to inspect: [(<Operation
+ endTime: '2024-08-24T16:38:59.316-07:00'
+ id: 8858901862534336994
+ insertTime: '2024-08-24T16:38:53.893-07:00'
+ kind: 'compute#operation'
+ name: 'operation-1724542732970-6207664ffaa59-d23dbe3c-22fb9981'
+ operationType: 'insert'
+ progress: 100
+ selfLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724542732970-6207664ffaa59-d23dbe3c-22fb9981'
+ startTime: '2024-08-24T16:38:53.893-07:00'
+ status: StatusValueValuesEnum(DONE, 0)
+ targetId: 7567186127525237218
+ targetLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance'
+ user: 'NK3H8WBQ@gmail.com'
+ warnings: [<WarningsValueListEntry
+ code: CodeValueValuesEnum(DISK_SIZE_LARGER_THAN_IMAGE_SIZE, 3)
+ data: [<DataValueListEntry
+ key: 'disk_size_gb'
+ value: '20'>, <DataValueListEntry
+ key: 'image_size_gb'
+ value: '10'>]
+ message: "Disk size: '20 GB' is larger than image size: '10 GB'. You might need to resize the root repartition manually if the operating system does not support automatic resizing. See https://cloud.google.com/compute/docs/disks/add-persistent-disk#resize_pd for details.">]
+ zone: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a'>, 3)]
+2024-08-25 00:39:00,667 INFO     ___FILE_ONLY___ Created [https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance].
+
+2024-08-25 00:39:00,672 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-25 00:39:02,379 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance?alt=json HTTP/1.1" 200 None
+2024-08-25 00:39:02,387 DEBUG    root            Chosen display Format:list[title="Some requests generated warnings:",always-display-title]
+2024-08-25 00:39:02,387 WARNING  root            Some requests generated warnings:
+ - Disk size: '20 GB' is larger than image size: '10 GB'. You might need to resize the root repartition manually if the operating system does not support automatic resizing. See https://cloud.google.com/compute/docs/disks/add-persistent-disk#resize_pd for details.
+
+2024-08-25 00:39:02,388 DEBUG    root            Chosen display Format:    table(
+      name,
+      zone.basename(),
+      machineType.machine_type().basename(),
+      scheduling.preemptible.yesno(yes=true, no=''),
+      networkInterfaces[].networkIP.notnull().list():label=INTERNAL_IP,
+      networkInterfaces[].accessConfigs[0].natIP.notnull().list()      :label=EXTERNAL_IP,
+      status
+    )
+2024-08-25 00:39:02,389 INFO     root            Display format: "    table(
+      name,
+      zone.basename(),
+      machineType.machine_type().basename(),
+      scheduling.preemptible.yesno(yes=true, no=''),
+      networkInterfaces[].networkIP.notnull().list():label=INTERNAL_IP,
+      networkInterfaces[].accessConfigs[0].natIP.notnull().list()      :label=EXTERNAL_IP,
+      status
+    )"
+2024-08-25 00:39:02,414 INFO     root            cache collection=compute.instances api_version=v1 params=['project', 'zone', 'instance']
+2024-08-25 00:39:02,453 INFO     ___FILE_ONLY___ NAME
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___               
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ ZONE
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___             
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ MACHINE_TYPE
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___     
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ PREEMPTIBLE
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___   
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ INTERNAL_IP
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___   
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ EXTERNAL_IP
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___     
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ STATUS
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ 
+
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ testing-instance
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___   
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ europe-west2-a
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___   
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ t2d-standard-1
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___   
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ true
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___          
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ 10.154.0.28
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___   
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ 35.214.49.135
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___   
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ RUNNING
+2024-08-25 00:39:02,454 INFO     ___FILE_ONLY___ 
+
+2024-08-25 00:39:02,462 DEBUG    root            Metrics reporting process started...

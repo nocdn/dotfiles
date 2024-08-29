@@ -1,0 +1,52 @@
+2024-08-27 15:16:18,084 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-08-27 15:16:18,086 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'disks']
+2024-08-27 15:16:18,091 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'disks', 'list']
+2024-08-27 15:16:18,092 DEBUG    root            Running [gcloud.compute.disks.list] with arguments: []
+2024-08-27 15:16:18,152 DEBUG    root            Chosen display Format:
+    table(
+      name,
+      location(),
+      location_scope(),
+      sizeGb,
+      type.basename(),
+      status
+      )
+2024-08-27 15:16:18,152 INFO     root            Display format: "
+    table(
+      name,
+      location(),
+      location_scope(),
+      sizeGb,
+      type.basename(),
+      status
+      )"
+2024-08-27 15:16:18,158 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-27 15:16:18,701 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/aggregated/disks?alt=json&includeAllScopes=True&maxResults=500&returnPartialSuccess=True HTTP/1.1" 200 None
+2024-08-27 15:16:18,730 INFO     root            cache collection=compute.disks api_version=v1 params=['project', 'zone', 'disk']
+2024-08-27 15:16:18,753 INFO     ___FILE_ONLY___ NAME
+2024-08-27 15:16:18,753 INFO     ___FILE_ONLY___                       
+2024-08-27 15:16:18,753 INFO     ___FILE_ONLY___ LOCATION
+2024-08-27 15:16:18,753 INFO     ___FILE_ONLY___         
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___ LOCATION_SCOPE
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___   
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___ SIZE_GB
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___   
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___ TYPE
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___          
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___ STATUS
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___ 
+
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___ cheaper-instance-disk-30
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___   
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___ europe-west9-a
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___   
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___ zone
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___             
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___ 30
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___        
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___ pd-balanced
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___   
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___ READY
+2024-08-27 15:16:18,754 INFO     ___FILE_ONLY___ 
+
+2024-08-27 15:16:18,761 DEBUG    root            Metrics reporting process started...

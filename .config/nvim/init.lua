@@ -36,48 +36,55 @@ vim.g.maplocalleader = "\\"
 
 -- Setup lazy.nvim
 require("lazy").setup({
-    spec = {{
-        "catppuccin/nvim",
-        name = "catppuccin",
-        priority = 1000
-    }, {
-        'nvim-telescope/telescope.nvim',
-        tag = '0.1.8',
-        dependencies = {'nvim-lua/plenary.nvim'}
-    }, {
-        "nvim-treesitter/nvim-treesitter",
-        build = ":TSUpdate"
-    }, {"ThePrimeagen/vim-be-good"}, {
-        "nvim-neo-tree/neo-tree.nvim",
-        opts = {
-            filesystem = {
-                filtered_items = {
-                    visible = true,
-                    show_hidden_count = true,
-                    hide_dotfiles = false,
-                    hide_gitignored = true,
-                    hide_by_name = {
-                        -- '.git',
-                        -- '.DS_Store',
-                        -- 'thumbs.db',
-                    },
-                    never_show = {}
-                }
+    spec = {
+        {
+            "catppuccin/nvim",
+            name = "catppuccin",
+            priority = 1000
+        },
+        {
+            'nvim-telescope/telescope.nvim',
+            tag = '0.1.8',
+            dependencies = {'nvim-lua/plenary.nvim'}
+        },
+        {
+            "nvim-treesitter/nvim-treesitter",
+            build = ":TSUpdate"
+        },
+        { "ThePrimeagen/vim-be-good" },
+        {
+            "nvim-neo-tree/neo-tree.nvim",
+            opts = {
+                filesystem = {
+                    filtered_items = {
+                        visible = true,
+                        show_hidden_count = true,
+                        hide_dotfiles = false,
+                        hide_gitignored = true,
+                        hide_by_name = {
+                            -- '.git',
+                            -- '.DS_Store',
+                            -- 'thumbs.db',
+                        },
+                        never_show = {}
+                    }
+                },
+            },
+            branch = "v3.x",
+            dependencies = {
+                "nvim-lua/plenary.nvim",
+                "nvim-tree/nvim-web-devicons", -- recommended
+                "MunifTanjim/nui.nvim" -- "3rd/image.nvim", -- Optional image support
             }
         },
-        branch = "v3.x",
-        dependencies = {"nvim-lua/plenary.nvim", "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
-                        "MunifTanjim/nui.nvim" -- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
-        }
-    }, {"williamboman/mason.nvim"}, {"supermaven-inc/supermaven-nvim"}},
-    -- Configure any other settings here. See the documentation for more details.
-    -- colorscheme that will be used when installing plugins.
+        { "williamboman/mason.nvim" },
+        { "supermaven-inc/supermaven-nvim" }
+    },
     install = {
         colorscheme = {"habamax"}
     },
-    -- automatically check for plugin updates
     checker = {
-        enabled = true
+        enabled = false
     }
 })
 
@@ -107,6 +114,21 @@ config = function()
     require("supermaven-nvim").setup({})
 end
 
-vim.keymap.set('n', '<leader>n', ':Neotree filesystem reveal left<CR>')
+-- Function to toggle Neo-tree
+local function toggle_neotree()
+    -- Use the vim.g.neo_tree_open variable to store the state
+    if vim.g.neo_tree_open then
+        -- If open, close it
+        vim.cmd('Neotree close')
+        vim.g.neo_tree_open = false
+    else
+        -- If closed, open it
+        vim.cmd('Neotree filesystem reveal left')
+        vim.g.neo_tree_open = true
+    end
+end
+
+-- Map the minus key to toggle Neo-tree
+vim.keymap.set('n', '-', toggle_neotree)
 
 require("mason").setup()

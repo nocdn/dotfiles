@@ -1,0 +1,274 @@
+2024-08-25 00:49:04,367 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-08-25 00:49:04,368 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances']
+2024-08-25 00:49:04,507 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances', 'create']
+2024-08-25 00:49:04,570 DEBUG    root            Running [gcloud.compute.instances.create] with arguments: [--boot-disk-size: "10737418240", --boot-disk-type: "pd-balanced", --machine-type: "t2d-standard-1", --metadata: "OrderedDict({'ssh-keys': 'nk3h8wbq:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDsKcw1zJdCT55sgYY1vGdaj+W5F1Uln/XUsSi8lXUe106diYQN0vVjVbpqbV/P8YEE3Oetvfcftmv+3ywxAbPjD/bLzIonfgdniw47uPGc46dbdmAcVhXlIoHz2eRipJhA1PzhgpKzouU3oQkPNsj8BKnCK1AkeIo5Z1fLTcQiPEG0zfMTBZ7gxb9+qJnz+i03b/j7GAk3wHgFSICZVekGejYdlESX/S4NWTJ2DOnWMRMUx87cQODRQ+4YZmAiyRKS2vWnwbOrAhm8VAv+4cEvHy8wg5d1o8bqBhQZ3CwuTcSc56/bin1WrBWva+43jgDYUPc9SOTPFVqN/utCb9pZ nk3h8wbq'})", --preemptible: "True", --scopes: "['https://www.googleapis.com/auth/cloud-platform']", --tags: "['minecraft', 'http-server', 'https-server']", --zone: "europe-west2-a", INSTANCE_NAMES:1: "['testing-instance']"]
+2024-08-25 00:49:04,588 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-25 00:49:05,271 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/zones/europe-west2-a?alt=json HTTP/1.1" 200 None
+2024-08-25 00:49:05,285 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-25 00:49:06,558 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances?alt=json HTTP/1.1" 200 None
+2024-08-25 00:49:06,564 DEBUG    root            Operations to inspect: [(<Operation
+ id: 938389166870744989
+ insertTime: '2024-08-24T16:49:06.457-07:00'
+ kind: 'compute#operation'
+ name: 'operation-1724543345578-62076898353b0-9efcd1ed-5a8c6d2d'
+ operationType: 'insert'
+ progress: 0
+ selfLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724543345578-62076898353b0-9efcd1ed-5a8c6d2d'
+ startTime: '2024-08-24T16:49:06.457-07:00'
+ status: StatusValueValuesEnum(RUNNING, 2)
+ targetId: 5195160214900821918
+ targetLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance'
+ user: 'NK3H8WBQ@gmail.com'
+ warnings: []
+ zone: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a'>, 3)]
+2024-08-25 00:49:06,568 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-25 00:49:12,021 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724543345578-62076898353b0-9efcd1ed-5a8c6d2d/wait?alt=json HTTP/1.1" 200 None
+2024-08-25 00:49:12,026 DEBUG    root            Operations to inspect: [(<Operation
+ endTime: '2024-08-24T16:49:11.169-07:00'
+ id: 938389166870744989
+ insertTime: '2024-08-24T16:49:06.457-07:00'
+ kind: 'compute#operation'
+ name: 'operation-1724543345578-62076898353b0-9efcd1ed-5a8c6d2d'
+ operationType: 'insert'
+ progress: 100
+ selfLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724543345578-62076898353b0-9efcd1ed-5a8c6d2d'
+ startTime: '2024-08-24T16:49:06.457-07:00'
+ status: StatusValueValuesEnum(DONE, 0)
+ targetId: 5195160214900821918
+ targetLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance'
+ user: 'NK3H8WBQ@gmail.com'
+ warnings: []
+ zone: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a'>, 3)]
+2024-08-25 00:49:12,027 INFO     ___FILE_ONLY___ Created [https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance].
+
+2024-08-25 00:49:12,031 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-25 00:49:22,107 DEBUG    root            HTTPSConnectionPool(host='compute.googleapis.com', port=443): Max retries exceeded with url: /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance?alt=json (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))
+Traceback (most recent call last):
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/connectionpool.py", line 717, in urlopen
+    httplib_response = self._make_request(
+                       ^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/connectionpool.py", line 406, in _make_request
+    self._validate_conn(conn)
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/connectionpool.py", line 1057, in _validate_conn
+    conn.connect()
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/connection.py", line 414, in connect
+    self.sock = ssl_wrap_socket(
+                ^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/util/ssl_.py", line 454, in ssl_wrap_socket
+    ssl_sock = _ssl_wrap_socket_impl(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/util/ssl_.py", line 498, in _ssl_wrap_socket_impl
+    return ssl_context.wrap_socket(sock, server_hostname=server_hostname)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/ssl.py", line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/ssl.py", line 1046, in _create
+    self.do_handshake()
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/ssl.py", line 1321, in do_handshake
+    self._sslobj.do_handshake()
+ssl.SSLEOFError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/requests/adapters.py", line 439, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/connectionpool.py", line 799, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/util/retry.py", line 592, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='compute.googleapis.com', port=443): Max retries exceeded with url: /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance?alt=json (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/calliope/cli.py", line 998, in Execute
+    resources = calliope_command.Run(cli=self, args=args)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/calliope/backend.py", line 822, in Run
+    resources = command_instance.Run(args)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/surface/compute/instances/create.py", line 756, in Run
+    return compute_client.MakeRequests(requests)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/api_lib/compute/client_adapter.py", line 128, in MakeRequests
+    objects = list(
+              ^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/api_lib/compute/request_helper.py", line 398, in MakeRequests
+    for response in waiters.WaitForOperations(
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/api_lib/compute/waiters.py", line 522, in WaitForOperations
+    responses, request_errors = single_request_helper.MakeSingleRequest(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/api_lib/compute/single_request_helper.py", line 69, in MakeSingleRequest
+    response = getattr(service, method)(request=request_body)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/generated_clients/apis/compute/v1/compute_v1_client.py", line 6346, in Get
+    return self._RunMethod(
+           ^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/apitools/base/py/base_api.py", line 734, in _RunMethod
+    http_response = http_wrapper.MakeRequest(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/apitools/base/py/http_wrapper.py", line 348, in MakeRequest
+    return _MakeRequestNoRetry(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/apitools/base/py/http_wrapper.py", line 397, in _MakeRequestNoRetry
+    info, content = http.request(
+                    ^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/requests.py", line 426, in HttpRequest
+    return orig_request_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/requests.py", line 510, in request
+    response = self.session.request(
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/transport.py", line 269, in WrappedRequest
+    response = orig_request(*modified_args, **modified_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/credentials/requests.py", line 107, in WrappedRequest
+    response = orig_request(
+               ^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/transport.py", line 269, in WrappedRequest
+    response = orig_request(*modified_args, **modified_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/requests.py", line 246, in WrappedRequest
+    return orig_request_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/requests/sessions.py", line 544, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/requests/sessions.py", line 657, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/requests/adapters.py", line 514, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='compute.googleapis.com', port=443): Max retries exceeded with url: /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance?alt=json (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))
+2024-08-25 00:49:22,131 ERROR    ___FILE_ONLY___ BEGIN CRASH STACKTRACE
+Traceback (most recent call last):
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/connectionpool.py", line 717, in urlopen
+    httplib_response = self._make_request(
+                       ^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/connectionpool.py", line 406, in _make_request
+    self._validate_conn(conn)
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/connectionpool.py", line 1057, in _validate_conn
+    conn.connect()
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/connection.py", line 414, in connect
+    self.sock = ssl_wrap_socket(
+                ^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/util/ssl_.py", line 454, in ssl_wrap_socket
+    ssl_sock = _ssl_wrap_socket_impl(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/util/ssl_.py", line 498, in _ssl_wrap_socket_impl
+    return ssl_context.wrap_socket(sock, server_hostname=server_hostname)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/ssl.py", line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/ssl.py", line 1046, in _create
+    self.do_handshake()
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/ssl.py", line 1321, in do_handshake
+    self._sslobj.do_handshake()
+ssl.SSLEOFError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/requests/adapters.py", line 439, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/connectionpool.py", line 799, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/urllib3/util/retry.py", line 592, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='compute.googleapis.com', port=443): Max retries exceeded with url: /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance?alt=json (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/command_lib/crash_handling.py", line 199, in Wrapper
+    target_function(*args, **kwargs)
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/gcloud_main.py", line 194, in main
+    gcloud_cli.Execute()
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/calliope/cli.py", line 1024, in Execute
+    self._HandleAllErrors(exc, command_path_string, specified_arg_names)
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/calliope/cli.py", line 1061, in _HandleAllErrors
+    exceptions.HandleError(exc, command_path_string, self.__known_error_handler)
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/calliope/exceptions.py", line 557, in HandleError
+    core_exceptions.reraise(exc)
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/exceptions.py", line 149, in reraise
+    six.reraise(type(exc_value), exc_value, tb)
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/six/__init__.py", line 719, in reraise
+    raise value
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/calliope/cli.py", line 998, in Execute
+    resources = calliope_command.Run(cli=self, args=args)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/calliope/backend.py", line 822, in Run
+    resources = command_instance.Run(args)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/surface/compute/instances/create.py", line 756, in Run
+    return compute_client.MakeRequests(requests)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/api_lib/compute/client_adapter.py", line 128, in MakeRequests
+    objects = list(
+              ^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/api_lib/compute/request_helper.py", line 398, in MakeRequests
+    for response in waiters.WaitForOperations(
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/api_lib/compute/waiters.py", line 522, in WaitForOperations
+    responses, request_errors = single_request_helper.MakeSingleRequest(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/api_lib/compute/single_request_helper.py", line 69, in MakeSingleRequest
+    response = getattr(service, method)(request=request_body)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/generated_clients/apis/compute/v1/compute_v1_client.py", line 6346, in Get
+    return self._RunMethod(
+           ^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/apitools/base/py/base_api.py", line 734, in _RunMethod
+    http_response = http_wrapper.MakeRequest(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/apitools/base/py/http_wrapper.py", line 348, in MakeRequest
+    return _MakeRequestNoRetry(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/apitools/base/py/http_wrapper.py", line 397, in _MakeRequestNoRetry
+    info, content = http.request(
+                    ^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/requests.py", line 426, in HttpRequest
+    return orig_request_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/requests.py", line 510, in request
+    response = self.session.request(
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/transport.py", line 269, in WrappedRequest
+    response = orig_request(*modified_args, **modified_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/credentials/requests.py", line 107, in WrappedRequest
+    response = orig_request(
+               ^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/transport.py", line 269, in WrappedRequest
+    response = orig_request(*modified_args, **modified_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/googlecloudsdk/core/requests.py", line 246, in WrappedRequest
+    return orig_request_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/requests/sessions.py", line 544, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/requests/sessions.py", line 657, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/google-cloud-sdk/468.0.0/google-cloud-sdk/lib/third_party/requests/adapters.py", line 514, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='compute.googleapis.com', port=443): Max retries exceeded with url: /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance?alt=json (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))
+2024-08-25 00:49:22,137 ERROR    root            gcloud crashed (SSLError): HTTPSConnectionPool(host='compute.googleapis.com', port=443): Max retries exceeded with url: /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance?alt=json (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))
+2024-08-25 00:49:22,148 INFO     ___FILE_ONLY___ 
+If you would like to report this issue, please run the following command:
+
+2024-08-25 00:49:22,148 INFO     ___FILE_ONLY___   gcloud feedback
+
+2024-08-25 00:49:22,148 INFO     ___FILE_ONLY___ 
+To check gcloud for common problems, please run the following command:
+
+2024-08-25 00:49:22,148 INFO     ___FILE_ONLY___   gcloud info --run-diagnostics
+
+2024-08-25 00:49:22,155 DEBUG    root            Metrics reporting process started...

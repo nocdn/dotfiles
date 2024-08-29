@@ -1,0 +1,90 @@
+2024-08-26 11:25:45,238 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-08-26 11:25:45,241 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'firewall_rules']
+2024-08-26 11:25:45,252 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'firewall-rules', 'create']
+2024-08-26 11:25:45,306 DEBUG    root            Running [gcloud.compute.firewall-rules.create] with arguments: [--allow: "['tcp:0-65535']", --description: "Allow all incoming traffic for testing", --direction: "INGRESS", --source-ranges: "['0.0.0.0/0']", --target-tags: "['testing']", NAME: "allow-all"]
+2024-08-26 11:25:45,330 INFO     ___FILE_ONLY___ Creating firewall...
+2024-08-26 11:25:45,335 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-26 11:25:46,171 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/global/firewalls?alt=json HTTP/1.1" 200 None
+2024-08-26 11:25:46,175 DEBUG    root            Operations to inspect: [(<Operation
+ id: 5843944978063156934
+ insertTime: '2024-08-26T03:25:45.992-07:00'
+ kind: 'compute#operation'
+ name: 'operation-1724667945602-620938c40ce49-7a50f698-888c1a55'
+ operationType: 'insert'
+ progress: 0
+ selfLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/global/operations/operation-1724667945602-620938c40ce49-7a50f698-888c1a55'
+ startTime: '2024-08-26T03:25:45.996-07:00'
+ status: StatusValueValuesEnum(RUNNING, 2)
+ targetId: 6590258217905940166
+ targetLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/global/firewalls/allow-all'
+ user: 'NK3H8WBQ@gmail.com'
+ warnings: []>, 3)]
+2024-08-26 11:25:46,178 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-26 11:25:50,903 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/global/operations/operation-1724667945602-620938c40ce49-7a50f698-888c1a55/wait?alt=json HTTP/1.1" 200 None
+2024-08-26 11:25:50,909 DEBUG    root            Operations to inspect: [(<Operation
+ endTime: '2024-08-26T03:25:50.700-07:00'
+ id: 5843944978063156934
+ insertTime: '2024-08-26T03:25:45.992-07:00'
+ kind: 'compute#operation'
+ name: 'operation-1724667945602-620938c40ce49-7a50f698-888c1a55'
+ operationType: 'insert'
+ progress: 100
+ selfLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/global/operations/operation-1724667945602-620938c40ce49-7a50f698-888c1a55'
+ startTime: '2024-08-26T03:25:45.996-07:00'
+ status: StatusValueValuesEnum(DONE, 0)
+ targetId: 6590258217905940166
+ targetLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/global/firewalls/allow-all'
+ user: 'NK3H8WBQ@gmail.com'
+ warnings: []>, 3)]
+2024-08-26 11:25:50,909 INFO     ___FILE_ONLY___ Created [https://www.googleapis.com/compute/v1/projects/modded-server-417514/global/firewalls/allow-all].
+
+2024-08-26 11:25:50,913 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-26 11:25:51,438 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/global/firewalls/allow-all?alt=json HTTP/1.1" 200 None
+2024-08-26 11:25:51,444 DEBUG    root            Chosen display Format:    table(
+      name,
+      network.basename(),
+      direction,
+      priority,
+      allowed[].map().firewall_rule().list():label=ALLOW,
+      denied[].map().firewall_rule().list():label=DENY,
+      disabled
+    )
+2024-08-26 11:25:51,445 INFO     root            Display format: "    table(
+      name,
+      network.basename(),
+      direction,
+      priority,
+      allowed[].map().firewall_rule().list():label=ALLOW,
+      denied[].map().firewall_rule().list():label=DENY,
+      disabled
+    )"
+2024-08-26 11:25:51,471 INFO     root            cache collection=compute.firewalls api_version=v1 params=['project', 'firewall']
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___ NAME
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___        
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___ NETWORK
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___   
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___ DIRECTION
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___   
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___ PRIORITY
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___   
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___ ALLOW
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___         
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___ DENY
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___   
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___ DISABLED
+2024-08-26 11:25:51,495 INFO     ___FILE_ONLY___ 
+
+2024-08-26 11:25:51,496 INFO     ___FILE_ONLY___ allow-all
+2024-08-26 11:25:51,496 INFO     ___FILE_ONLY___   
+2024-08-26 11:25:51,496 INFO     ___FILE_ONLY___ default
+2024-08-26 11:25:51,496 INFO     ___FILE_ONLY___   
+2024-08-26 11:25:51,496 INFO     ___FILE_ONLY___ INGRESS
+2024-08-26 11:25:51,496 INFO     ___FILE_ONLY___     
+2024-08-26 11:25:51,496 INFO     ___FILE_ONLY___ 1000
+2024-08-26 11:25:51,496 INFO     ___FILE_ONLY___       
+2024-08-26 11:25:51,496 INFO     ___FILE_ONLY___ tcp:0-65535
+2024-08-26 11:25:51,496 INFO     ___FILE_ONLY___         
+2024-08-26 11:25:51,496 INFO     ___FILE_ONLY___ False
+2024-08-26 11:25:51,496 INFO     ___FILE_ONLY___ 
+
+2024-08-26 11:25:51,503 DEBUG    root            Metrics reporting process started...

@@ -1,0 +1,32 @@
+2024-08-26 12:39:59,020 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-08-26 12:39:59,022 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances']
+2024-08-26 12:39:59,029 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances', 'list']
+2024-08-26 12:39:59,030 DEBUG    root            Running [gcloud.compute.instances.list] with arguments: [--format: "table[no-heading](name, networkInterfaces[0].accessConfigs[0].natIP:label=EXTERNAL_IP)"]
+2024-08-26 12:39:59,058 DEBUG    google.auth.transport.requests Making request: POST https://oauth2.googleapis.com/token
+2024-08-26 12:39:59,147 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): oauth2.googleapis.com:443
+2024-08-26 12:39:59,545 DEBUG    urllib3.connectionpool https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None
+2024-08-26 12:39:59,643 DEBUG    root            Chosen display Format:    table(
+      name,
+      zone.basename(),
+      machineType.machine_type().basename(),
+      scheduling.preemptible.yesno(yes=true, no=''),
+      networkInterfaces[].networkIP.notnull().list():label=INTERNAL_IP,
+      networkInterfaces[].accessConfigs[0].natIP.notnull().list()      :label=EXTERNAL_IP,
+      status
+    ) table[no-heading](name, networkInterfaces[0].accessConfigs[0].natIP:label=EXTERNAL_IP)
+2024-08-26 12:39:59,644 INFO     root            Display format: "    table(
+      name,
+      zone.basename(),
+      machineType.machine_type().basename(),
+      scheduling.preemptible.yesno(yes=true, no=''),
+      networkInterfaces[].networkIP.notnull().list():label=INTERNAL_IP,
+      networkInterfaces[].accessConfigs[0].natIP.notnull().list()      :label=EXTERNAL_IP,
+      status
+    ) table[no-heading](name, networkInterfaces[0].accessConfigs[0].natIP:label=EXTERNAL_IP)"
+2024-08-26 12:39:59,714 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-26 12:40:00,384 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/aggregated/instances?alt=json&includeAllScopes=True&maxResults=500&returnPartialSuccess=True HTTP/1.1" 200 None
+2024-08-26 12:40:00,419 INFO     root            cache collection=compute.instances api_version=v1 params=['project', 'zone', 'instance']
+2024-08-26 12:40:00,443 INFO     ___FILE_ONLY___ cheaper-server
+2024-08-26 12:40:00,443 INFO     ___FILE_ONLY___ 
+
+2024-08-26 12:40:00,451 DEBUG    root            Metrics reporting process started...

@@ -1,0 +1,11 @@
+2024-08-26 11:14:02,158 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-08-26 11:14:02,159 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances']
+2024-08-26 11:14:02,164 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances', 'describe']
+2024-08-26 11:14:02,164 DEBUG    root            Running [gcloud.compute.instances.describe] with arguments: [--format: "get(networkInterfaces[0].accessConfigs[0].natIP)", --zone: "europe-west2-a", INSTANCE_NAME: "testing-instance"]
+2024-08-26 11:14:02,229 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-26 11:14:02,611 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance?alt=json HTTP/1.1" 200 None
+2024-08-26 11:14:02,618 DEBUG    root            Chosen display Format:default get(networkInterfaces[0].accessConfigs[0].natIP)
+2024-08-26 11:14:02,619 INFO     root            Display format: "default get(networkInterfaces[0].accessConfigs[0].natIP)"
+2024-08-26 11:14:02,637 INFO     ___FILE_ONLY___ 35.214.49.135
+
+2024-08-26 11:14:02,647 DEBUG    root            Metrics reporting process started...

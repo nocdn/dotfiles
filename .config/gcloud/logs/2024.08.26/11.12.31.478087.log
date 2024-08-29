@@ -1,0 +1,14 @@
+2024-08-26 11:12:31,487 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-08-26 11:12:31,489 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances']
+2024-08-26 11:12:31,493 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances', 'stop']
+2024-08-26 11:12:31,494 DEBUG    root            Running [gcloud.compute.instances.stop] with arguments: [--zone: "europe-west2-a", INSTANCE_NAMES:1: "['testing-instance']"]
+2024-08-26 11:12:31,561 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-26 11:12:32,119 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance/stop?alt=json HTTP/1.1" 200 None
+2024-08-26 11:12:32,124 INFO     ___FILE_ONLY___ Stopping instance(s) testing-instance...
+2024-08-26 11:12:33,131 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-26 11:13:23,317 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724667151810-620935cf07ef1-057564e8-9f604721/wait?alt=json HTTP/1.1" 200 None
+2024-08-26 11:13:23,448 INFO     ___FILE_ONLY___ Updated [https://compute.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance].
+
+2024-08-26 11:13:23,449 DEBUG    root            Chosen display Format:none
+2024-08-26 11:13:23,449 INFO     root            Display format: "none"
+2024-08-26 11:13:23,465 DEBUG    root            Metrics reporting process started...
