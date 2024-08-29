@@ -5,7 +5,7 @@ vim.g.mapleader = " "
 -- indenting with 2 spaces
 -- use spaces instead of tab characters
 vim.cmd("set expandtab")
--- determines width of tab character in spaced
+-- determines width of tab character in spaces
 vim.cmd("set tabstop=2")
 -- controls how many spaces inserted when tab pressed
 vim.cmd("set softtabstop=2")
@@ -55,6 +55,10 @@ require("lazy").setup({
         {
             "nvim-neo-tree/neo-tree.nvim",
             opts = {
+                -- Make Neo-tree smaller by setting the width
+                window = {
+                    width = 30,  -- Adjust this number to set the desired width
+                },
                 filesystem = {
                     filtered_items = {
                         visible = true,
@@ -114,10 +118,6 @@ config = function()
     require("supermaven-nvim").setup({})
 end
 
--- Automatically open Neo-tree on startup
-vim.cmd('Neotree filesystem reveal left')
-vim.g.neo_tree_open = true  -- Ensure the state variable is set to true
-
 -- Function to toggle focus between Neo-tree and the editor
 local function toggle_neotree_focus()
     if vim.g.neo_tree_open then
@@ -140,7 +140,42 @@ local function toggle_neotree_focus()
     end
 end
 
+-- Automatically open Neo-tree on startup but keep editor focused
+vim.cmd('Neotree filesystem reveal left')  -- Open Neo-tree
+
+-- Use vim.schedule to ensure focus switch happens after Neo-tree opens
+vim.schedule(function()
+    vim.cmd('wincmd p')  -- Go back to the editor window
+end)
+
+vim.g.neo_tree_open = true  -- Ensure the state variable is set to true
+
 -- Map the minus key to toggle focus between Neo-tree and the editor
 vim.keymap.set('n', '-', toggle_neotree_focus)
+
+-- Function to override :wqa behavior if Neo-tree is focused
+local function wqa_override()
+    -- Check if Neo-tree is currently focused
+    local win = vim.api.nvim_get_current_win()
+    local buf = vim.api.nvim_win_get_buf(win)
+    local buf_ft = vim.api.nvim_buf_get_option(buf, "filetype")
+
+    if buf_ft == "neo-tree" then
+        -- If Neo-tree is focused, force save all and quit
+        vim.cmd('wqa!')
+    else
+        -- Otherwise, perform normal save and quit all
+        vim.cmd('wqa')
+    end
+end
+
+-- Define custom command WqaOverride
+vim.api.nvim_create_user_command('WqaOverride', wqa_override, {})
+
+-- Map :wqa to WqaOverride
+vim.api.nvim_set_keymap('c', 'wqa', 'WqaOverride', { noremap = true, silent = true })
+
+-- Map the plus key to WqaOverride
+vim.keymap.set('n', '=', wqa_override, { noremap = true, silent = true })
 
 require("mason").setup()
