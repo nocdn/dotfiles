@@ -1,0 +1,110 @@
+2024-08-29 17:42:01,382 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
+2024-08-29 17:42:01,392 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances']
+2024-08-29 17:42:01,560 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances', 'create']
+2024-08-29 17:42:01,661 DEBUG    root            Running [gcloud.compute.instances.create] with arguments: [--boot-disk-size: "10737418240", --boot-disk-type: "pd-ssd", --machine-type: "t2d-standard-1", --metadata: "OrderedDict({'ssh-keys': 'nk3h8wbq:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDsKcw1zJdCT55sgYY1vGdaj+W5F1Uln/XUsSi8lXUe106diYQN0vVjVbpqbV/P8YEE3Oetvfcftmv+3ywxAbPjD/bLzIonfgdniw47uPGc46dbdmAcVhXlIoHz2eRipJhA1PzhgpKzouU3oQkPNsj8BKnCK1AkeIo5Z1fLTcQiPEG0zfMTBZ7gxb9+qJnz+i03b/j7GAk3wHgFSICZVekGejYdlESX/S4NWTJ2DOnWMRMUx87cQODRQ+4YZmAiyRKS2vWnwbOrAhm8VAv+4cEvHy8wg5d1o8bqBhQZ3CwuTcSc56/bin1WrBWva+43jgDYUPc9SOTPFVqN/utCb9pZ nk3h8wbq'})", --preemptible: "True", --scopes: "['https://www.googleapis.com/auth/cloud-platform']", --tags: "['testing', 'minecraft', 'http-server', 'https-server']", --zone: "europe-west2-a", INSTANCE_NAMES:1: "['testing-instance']"]
+2024-08-29 17:42:01,675 DEBUG    google.auth.transport.requests Making request: POST https://oauth2.googleapis.com/token
+2024-08-29 17:42:01,696 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): oauth2.googleapis.com:443
+2024-08-29 17:42:01,836 DEBUG    urllib3.connectionpool https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None
+2024-08-29 17:42:01,886 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-29 17:42:02,467 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/zones/europe-west2-a?alt=json HTTP/1.1" 200 None
+2024-08-29 17:42:02,483 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-29 17:42:04,605 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances?alt=json HTTP/1.1" 200 None
+2024-08-29 17:42:04,608 DEBUG    root            Operations to inspect: [(<Operation
+ id: 1200737992788744755
+ insertTime: '2024-08-29T09:42:04.405-07:00'
+ kind: 'compute#operation'
+ name: 'operation-1724949722683-620d52779d905-26447f8b-47feac13'
+ operationType: 'insert'
+ progress: 0
+ selfLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724949722683-620d52779d905-26447f8b-47feac13'
+ startTime: '2024-08-29T09:42:04.406-07:00'
+ status: StatusValueValuesEnum(RUNNING, 2)
+ targetId: 1279384728083700276
+ targetLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance'
+ user: 'NK3H8WBQ@gmail.com'
+ warnings: []
+ zone: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a'>, 3)]
+2024-08-29 17:42:04,612 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-29 17:42:09,700 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "POST /compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724949722683-620d52779d905-26447f8b-47feac13/wait?alt=json HTTP/1.1" 200 None
+2024-08-29 17:42:09,703 DEBUG    root            Operations to inspect: [(<Operation
+ endTime: '2024-08-29T09:42:09.626-07:00'
+ id: 1200737992788744755
+ insertTime: '2024-08-29T09:42:04.405-07:00'
+ kind: 'compute#operation'
+ name: 'operation-1724949722683-620d52779d905-26447f8b-47feac13'
+ operationType: 'insert'
+ progress: 100
+ selfLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/operations/operation-1724949722683-620d52779d905-26447f8b-47feac13'
+ startTime: '2024-08-29T09:42:04.406-07:00'
+ status: StatusValueValuesEnum(DONE, 0)
+ targetId: 1279384728083700276
+ targetLink: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance'
+ user: 'NK3H8WBQ@gmail.com'
+ warnings: []
+ zone: 'https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a'>, 3)]
+2024-08-29 17:42:09,704 INFO     ___FILE_ONLY___ Created [https://www.googleapis.com/compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance].
+
+2024-08-29 17:42:09,707 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): compute.googleapis.com:443
+2024-08-29 17:42:09,967 DEBUG    urllib3.connectionpool https://compute.googleapis.com:443 "GET /compute/v1/projects/modded-server-417514/zones/europe-west2-a/instances/testing-instance?alt=json HTTP/1.1" 200 None
+2024-08-29 17:42:09,971 DEBUG    root            Chosen display Format:    table(
+      name,
+      zone.basename(),
+      machineType.machine_type().basename(),
+      scheduling.preemptible.yesno(yes=true, no=''),
+      networkInterfaces[].networkIP.notnull().list():label=INTERNAL_IP,
+      networkInterfaces[].accessConfigs[0].natIP.notnull().list()      :label=EXTERNAL_IP,
+      status
+    )
+2024-08-29 17:42:09,972 INFO     root            Display format: "    table(
+      name,
+      zone.basename(),
+      machineType.machine_type().basename(),
+      scheduling.preemptible.yesno(yes=true, no=''),
+      networkInterfaces[].networkIP.notnull().list():label=INTERNAL_IP,
+      networkInterfaces[].accessConfigs[0].natIP.notnull().list()      :label=EXTERNAL_IP,
+      status
+    )"
+2024-08-29 17:42:09,999 INFO     root            cache collection=compute.instances api_version=v1 params=['project', 'zone', 'instance']
+2024-08-29 17:42:10,030 INFO     ___FILE_ONLY___ NAME
+2024-08-29 17:42:10,030 INFO     ___FILE_ONLY___               
+2024-08-29 17:42:10,030 INFO     ___FILE_ONLY___ ZONE
+2024-08-29 17:42:10,030 INFO     ___FILE_ONLY___             
+2024-08-29 17:42:10,030 INFO     ___FILE_ONLY___ MACHINE_TYPE
+2024-08-29 17:42:10,030 INFO     ___FILE_ONLY___     
+2024-08-29 17:42:10,030 INFO     ___FILE_ONLY___ PREEMPTIBLE
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___   
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___ INTERNAL_IP
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___   
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___ EXTERNAL_IP
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___     
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___ STATUS
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___ 
+
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___ testing-instance
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___   
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___ europe-west2-a
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___   
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___ t2d-standard-1
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___   
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___ true
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___          
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___ 10.154.0.34
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___   
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___ 35.214.49.135
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___   
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___ RUNNING
+2024-08-29 17:42:10,031 INFO     ___FILE_ONLY___ 
+
+2024-08-29 17:42:10,032 DEBUG    root            Checking for updates...
+2024-08-29 17:42:10,049 DEBUG    urllib3.connectionpool Starting new HTTPS connection (1): dl.google.com:443
+2024-08-29 17:42:10,254 DEBUG    urllib3.connectionpool https://dl.google.com:443 "GET /dl/cloudsdk/channels/rapid/components-2.json HTTP/1.1" 200 229029
+2024-08-29 17:42:10,376 DEBUG    root            Updating notification cache...
+2024-08-29 17:42:10,377 DEBUG    root            Activating notification: [default]
+2024-08-29 17:42:10,377 INFO     ___FILE_ONLY___ 
+
+Updates are available for some Google Cloud CLI components.  To install them,
+please run:
+  $ gcloud components update
+
+
+2024-08-29 17:42:10,385 DEBUG    root            Metrics reporting process started...

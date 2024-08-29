@@ -57,7 +57,7 @@ require("lazy").setup({
             opts = {
                 -- Make Neo-tree smaller by setting the width
                 window = {
-                    width = 25,  -- Adjust this number to set the desired width
+                    width = 25,
                 },
                 filesystem = {
                     filtered_items = {

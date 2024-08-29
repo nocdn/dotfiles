@@ -930,6 +930,28 @@ function yy() {
 	rm -f -- "$tmp"
 }
 
+function sox_audio() {
+    # Check if a file argument is provided
+    if [ -z "$1" ]; then
+        echo "Usage: convert_audio <filename>"
+        return 1
+    fi
+
+    # Get the input file name
+    input_file="$1"
+
+    # Extract the base name and extension of the file
+    base_name="${input_file%.*}"
+    extension="${input_file##*.}"
+
+    # Create the output file name with (sox) appended
+    output_file="${base_name}(sox).${extension}"
+
+    # Use sox to perform the audio conversion
+    sox "$input_file" "$output_file" vol 0.8 bass +2 reverb 25 50 100 100 0 0
+
+    echo "Conversion completed: $output_file"
+}
 
 source <(fzf --zsh)
 
