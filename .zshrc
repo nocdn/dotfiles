@@ -59,7 +59,7 @@ alias hist="cat .zsh_history | fzf | pbcopy"
 alias fcat="fzf | xargs cat"
 alias ls="eza"
 alias la="eza -l --no-permissions --no-user --no-filesize --sort=date"
-alias laa="eza -la --no-permissions --no-user --no-filesize --sort=date"
+alias laa="eza -la --no-permissions --no-user --sort=date"
 
 alias gs='git status'
 alias ga='git add'
@@ -965,5 +965,5 @@ source ~/.zsh_secrets
 . "$HOME/.cargo/env"
 
 # syntax highlighting
-source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
+source ~/.zsh/catppuccin_frappe-zsh-syntax-highlighting.zsh
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
