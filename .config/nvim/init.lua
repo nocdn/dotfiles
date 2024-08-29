@@ -2,6 +2,8 @@
 vim.wo.relativenumber = true
 vim.g.mapleader = " "
 
+vim.g.have_nerd_font = true
+
 -- indenting with 2 spaces
 -- use spaces instead of tab characters
 vim.cmd("set expandtab")
