@@ -114,21 +114,33 @@ config = function()
     require("supermaven-nvim").setup({})
 end
 
--- Function to toggle Neo-tree
-local function toggle_neotree()
-    -- Use the vim.g.neo_tree_open variable to store the state
+-- Automatically open Neo-tree on startup
+vim.cmd('Neotree filesystem reveal left')
+vim.g.neo_tree_open = true  -- Ensure the state variable is set to true
+
+-- Function to toggle focus between Neo-tree and the editor
+local function toggle_neotree_focus()
     if vim.g.neo_tree_open then
-        -- If open, close it
-        vim.cmd('Neotree close')
-        vim.g.neo_tree_open = false
+        -- Check if Neo-tree is currently focused
+        local win = vim.api.nvim_get_current_win()
+        local buf = vim.api.nvim_win_get_buf(win)
+        local buf_ft = vim.api.nvim_buf_get_option(buf, "filetype")
+
+        if buf_ft == "neo-tree" then
+            -- If Neo-tree is focused, switch to the previous window
+            vim.cmd('wincmd p')
+        else
+            -- If the editor is focused, switch to Neo-tree
+            vim.cmd('Neotree focus')
+        end
     else
-        -- If closed, open it
+        -- Open Neo-tree if it's not open
         vim.cmd('Neotree filesystem reveal left')
         vim.g.neo_tree_open = true
     end
 end
 
--- Map the minus key to toggle Neo-tree
-vim.keymap.set('n', '-', toggle_neotree)
+-- Map the minus key to toggle focus between Neo-tree and the editor
+vim.keymap.set('n', '-', toggle_neotree_focus)
 
 require("mason").setup()
