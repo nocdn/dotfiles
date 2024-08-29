@@ -57,7 +57,7 @@ require("lazy").setup({
             opts = {
                 -- Make Neo-tree smaller by setting the width
                 window = {
-                    width = 30,  -- Adjust this number to set the desired width
+                    width = 25,  -- Adjust this number to set the desired width
                 },
                 filesystem = {
                     filtered_items = {
@@ -154,7 +154,7 @@ vim.g.neo_tree_open = true  -- Ensure the state variable is set to true
 vim.keymap.set('n', '-', toggle_neotree_focus)
 
 -- Function to override :wqa behavior if Neo-tree is focused
-local function wqa_override()
+local function save_quit_all_override()
     -- Check if Neo-tree is currently focused
     local win = vim.api.nvim_get_current_win()
     local buf = vim.api.nvim_win_get_buf(win)
@@ -169,13 +169,10 @@ local function wqa_override()
     end
 end
 
--- Define custom command WqaOverride
-vim.api.nvim_create_user_command('WqaOverride', wqa_override, {})
+-- Define custom command SaveQuitAllOverride
+vim.api.nvim_create_user_command('SaveQuitAllOverride', save_quit_all_override, {})
 
--- Map :wqa to WqaOverride
-vim.api.nvim_set_keymap('c', 'wqa', 'WqaOverride', { noremap = true, silent = true })
-
--- Map the plus key to WqaOverride
-vim.keymap.set('n', '=', wqa_override, { noremap = true, silent = true })
+-- Map the plus key to SaveQuitAllOverride
+vim.keymap.set('n', '=', save_quit_all_override, { noremap = true, silent = true })
 
 require("mason").setup()
