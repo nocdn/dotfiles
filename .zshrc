@@ -98,7 +98,10 @@ bindkey "^[[A" history-search-backward
 bindkey "^[[B" history-search-forward
 
 # Prompt customization
-PS1="%F{white}%n %F{#F38BA8}%~ %F{white}%# %F"
+# dark theme
+# PS1="%F{white}%n %F{#F38BA8}%~ %F{white}%# %F"
+# light theme
+PS1="%F{black}%n %F{#B75D74}%~ %F{black}%# %F"
 
 # personal functions
 function listinstances() {
@@ -964,6 +967,8 @@ source ~/.zsh_secrets
 
 . "$HOME/.cargo/env"
 
-# syntax highlighting
-source ~/.zsh/catppuccin_frappe-zsh-syntax-highlighting.zsh
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# dark mode syntax highlighting
+# source ~/.zsh/catppuccin_frappe-zsh-syntax-highlighting.zsh
+# light mode syntax highlighting
+# source ~/.zsh/dracula-zsh-syntax-highlighting.sh
+# source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
