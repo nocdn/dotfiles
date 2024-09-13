@@ -590,9 +590,8 @@ transcribe() {
             --header "Accept: application/json" \
             --header "Content-Type: application/json" \
             --data '{
-                "url": "'"$file_url"'",
-                "audioFormat": "mp3",
-                "downloadMode": "audio"
+                \"url\": \"$file_url\",
+                \"isAudioOnly\": true
             }')
 
         echo "Cobalt API response: $cobalt_response"
