@@ -491,40 +491,49 @@ upload() {
 transcribe() {
     # Check for help flag
     if [[ "$1" == "--help" ]]; then
-        echo "\nUsage: transcribe [-f|--file <file_path>] [<file_url>] [-o|--output <output_file>]"
+        echo "\nUsage: transcribe [-f|--file <file_path>] [-yt|--youtube <youtube_url>] [<file_url>] [-o|--output <output_file>]"
         echo
         echo "Description:"
-        echo "  Transcribes audio from a file or URL using the fal.ai Wizper service."
+        echo "  Transcribes audio from a file, YouTube URL, or another URL using the fal.ai Wizper service."
         echo
         echo "Options:"
         echo "  -f, --file <file_path>          Specify a local file to upload and transcribe"
+        echo "  -yt, --youtube <youtube_url>    Specify a YouTube URL to extract and transcribe audio"
         echo "  -o, --output <output_file>      Save the transcription to a file"
         echo "  --help                          Display this help message"
         echo
         echo "Arguments:"
-        echo "  <file_url>                      URL of audio file to transcribe (if not using -f)"
+        echo "  <file_url>                      URL of an audio file to transcribe (if not using -f or -yt)"
         echo
         echo "Details:"
-        echo "  - If -f is used, the local file is first uploaded using the 'upload' function"
+        echo "  - If -f is used, the local file is uploaded using the 'upload' function"
+        echo "  - If -yt is used, the YouTube URL is processed to extract the audio download link"
         echo "  - The transcription is performed using the fal.ai Wizper service"
         echo "  - The resulting transcription is displayed in the terminal"
         echo "  - The transcription is automatically copied to the clipboard"
-        echo "  - If -o is used, the transcription is also saved to the specified file"
+        echo "  - If -o is used, the transcription is saved to the specified file"
         echo
         echo "Environment Variables:"
-        echo "  FAL_KEY                          API key for the fal.ai service (must be set)\n"
+        echo "  FAL_KEY                          API key for the fal.ai service (must be set)"
+        echo "  COBALT_KEY                       API key for the cobalt.tools service (must be set)\n"
         return 0
     fi
 
     local file_url=""
     local is_local=false
+    local is_youtube=false
     local output_file=""
 
-    # parse arguments
+    # Parse arguments
     while [[ "$#" -gt 0 ]]; do
         case $1 in
             -f|--file)
                 is_local=true
+                file_url="$2"
+                shift 2
+                ;;
+            -yt|--youtube)
+                is_youtube=true
                 file_url="$2"
                 shift 2
                 ;;
@@ -539,9 +548,6 @@ transcribe() {
         esac
     done
 
-    # Log arguments
-    # echo "Arguments: is_local=$is_local, file_url=$file_url, output_file=$output_file"
-
     # If the -f flag is present, upload the file first
     if $is_local; then
         if [[ -z "$file_url" ]]; then
@@ -555,9 +561,36 @@ transcribe() {
             echo "File upload failed."
             return 1
         fi
-        # echo "Uploaded file URL: $file_url"
     fi
 
+    # If the -yt flag is present, use the cobalt API to extract the download URL from the YouTube link
+    if $is_youtube; then
+        if [[ -z "$file_url" ]]; then
+            echo "Error: No YouTube URL provided."
+            echo "Usage: transcribe -yt <youtube_url> [-o <output_file>] or transcribe <file_url> [-o <output_file>]"
+            return 1
+        fi
+        echo "Extracting download URL from YouTube: $file_url"
+        local cobalt_response=$(curl -s --request POST \
+            --url https://api.cobalt.tools/api/json \
+            --header "Authorization: Key $COBALT_KEY" \
+            --header "Accept: application/json" \
+            --header "Content-Type: application/json" \
+            --data '{
+                "url": "'"$file_url"'",
+                "audioFormat": "mp3",
+                "downloadMode": "audio"
+            }')
+
+        file_url=$(echo "$cobalt_response" | jq -r '.url')
+        if [[ -z "$file_url" ]]; then
+            echo "Error: Failed to extract download URL from YouTube."
+            return 1
+        fi
+        echo "Download URL extracted: $file_url"
+    fi
+
+    # If no file URL is provided, error out
     if [[ -z "$file_url" ]]; then
         echo "Error: No file URL provided."
         echo "Usage: transcribe -f <file_path> [-o <output_file>] or transcribe <file_url> [-o <output_file>]"
@@ -566,9 +599,8 @@ transcribe() {
 
     # Encode the file URL to handle spaces
     encoded_url=$(echo "$file_url" | sed 's/ /%20/g')
-    # echo "Encoded URL: $encoded_url"
 
-    # Perform transcription
+    # Perform transcription using fal.ai Wizper
     local transcription=$(curl -s --request POST \
         --url https://fal.run/fal-ai/wizper \
         --header "Authorization: Key $FAL_KEY" \
@@ -586,12 +618,10 @@ transcribe() {
     # Copy transcription to clipboard
     echo "$transcription" | pbcopy
 
-    # If output file is specified, save transcription to file and output file path
+    # If output file is specified, save transcription to file
     if [[ -n "$output_file" ]]; then
         echo "$transcription" > "$output_file"
         echo "Transcription saved to: $output_file"
-    else
-        # echo "$transcription"
     fi
 }
 
