@@ -514,8 +514,7 @@ transcribe() {
         echo "  - If -o is used, the transcription is saved to the specified file"
         echo
         echo "Environment Variables:"
-        echo "  FAL_KEY                          API key for the fal.ai service (must be set)"
-        echo "  COBALT_KEY                       API key for the cobalt.tools service (must be set)\n"
+        echo "  FAL_KEY                          API key for the fal.ai service (must be set)\n"
         return 0
     fi
 
@@ -524,29 +523,42 @@ transcribe() {
     local is_youtube=false
     local output_file=""
 
+    echo "Starting transcription process..."
+    echo "Initial arguments: $@"
+
     # Parse arguments
     while [[ "$#" -gt 0 ]]; do
         case $1 in
             -f|--file)
                 is_local=true
                 file_url="$2"
+                echo "Local file flag detected. File path: $file_url"
                 shift 2
                 ;;
             -yt|--youtube)
                 is_youtube=true
                 file_url="$2"
+                echo "YouTube flag detected. YouTube URL: $file_url"
                 shift 2
                 ;;
             -o|--output)
                 output_file="$2"
+                echo "Output file specified: $output_file"
                 shift 2
                 ;;
             *)
                 file_url="$1"
+                echo "File URL argument detected: $file_url"
                 shift
                 ;;
         esac
     done
+
+    echo "Final parsed arguments:"
+    echo "  - is_local: $is_local"
+    echo "  - is_youtube: $is_youtube"
+    echo "  - file_url: $file_url"
+    echo "  - output_file: $output_file"
 
     # If the -f flag is present, upload the file first
     if $is_local; then
@@ -555,12 +567,13 @@ transcribe() {
             echo "Usage: transcribe -f <file_path> [-o <output_file>] or transcribe <file_url> [-o <output_file>]"
             return 1
         fi
-        echo "Uploading file: $file_url"
+        echo "Uploading local file: $file_url"
         file_url=$(upload "$file_url")
         if [[ $? -ne 0 ]]; then
             echo "File upload failed."
             return 1
         fi
+        echo "File successfully uploaded. New URL: $file_url"
     fi
 
     # If the -yt flag is present, use the cobalt API to extract the download URL from the YouTube link
@@ -571,9 +584,9 @@ transcribe() {
             return 1
         fi
         echo "Extracting download URL from YouTube: $file_url"
+
         local cobalt_response=$(curl -s --request POST \
             --url https://api.cobalt.tools/api/json \
-            --header "Authorization: Key $COBALT_KEY" \
             --header "Accept: application/json" \
             --header "Content-Type: application/json" \
             --data '{
@@ -582,12 +595,17 @@ transcribe() {
                 "downloadMode": "audio"
             }')
 
+        echo "Cobalt API response: $cobalt_response"
+
+        # Extract the download URL from the response
         file_url=$(echo "$cobalt_response" | jq -r '.url')
-        if [[ -z "$file_url" ]]; then
+        echo "Extracted file URL from Cobalt: $file_url"
+
+        if [[ -z "$file_url" || "$file_url" == "null" ]]; then
             echo "Error: Failed to extract download URL from YouTube."
+            echo "Cobalt response: $cobalt_response"
             return 1
         fi
-        echo "Download URL extracted: $file_url"
     fi
 
     # If no file URL is provided, error out
@@ -597,10 +615,14 @@ transcribe() {
         return 1
     fi
 
+    echo "File URL ready for transcription: $file_url"
+
     # Encode the file URL to handle spaces
     encoded_url=$(echo "$file_url" | sed 's/ /%20/g')
+    echo "Encoded URL: $encoded_url"
 
     # Perform transcription using fal.ai Wizper
+    echo "Starting transcription request to fal.ai Wizper..."
     local transcription=$(curl -s --request POST \
         --url https://fal.run/fal-ai/wizper \
         --header "Authorization: Key $FAL_KEY" \
@@ -612,17 +634,31 @@ transcribe() {
             "task": "transcribe"
         }' | jq .text -r)
 
+    echo "Transcription response: $transcription"
+
+    # If transcription fails, handle it
+    if [[ -z "$transcription" || "$transcription" == "null" ]]; then
+        echo "Error: Transcription failed."
+        return 1
+    fi
+
     # Log transcription
-    echo "$transcription"
+    echo "Transcription result: $transcription"
 
     # Copy transcription to clipboard
+    echo "Copying transcription to clipboard..."
     echo "$transcription" | pbcopy
 
     # If output file is specified, save transcription to file
     if [[ -n "$output_file" ]]; then
+        echo "Saving transcription to file: $output_file"
         echo "$transcription" > "$output_file"
         echo "Transcription saved to: $output_file"
+    else
+        echo "No output file specified. Transcription displayed above."
     fi
+
+    echo "Transcription process completed successfully."
 }
 
 function compressAudio() {
