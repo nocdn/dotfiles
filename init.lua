@@ -194,4 +194,6 @@ vim.api.nvim_create_user_command('SaveQuitAllOverride', save_quit_all_override, 
 -- Map the plus key to SaveQuitAllOverride
 vim.keymap.set('n', '=', save_quit_all_override, { noremap = true, silent = true })
 
+vim.api.nvim_set_keymap('n', '<leader>s', ':SupermavenToggle<CR>', { noremap = true, silent = true }) 
+
 require("mason").setup()
