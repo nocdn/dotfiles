@@ -99,9 +99,9 @@ bindkey "^[[B" history-search-forward
 
 # Prompt customization
 # dark theme
-# PS1="%F{white}%n %F{#F38BA8}%~ %F{white}%# %F"
+# PS1="%F{white}%n %F{#F38BA8}%~ %F{white}%# "
 # light theme
-PS1="%F{black}%n %F{#B75D74}%~ %F{black}%# %F"
+PS1="%F{black}%n %F{#B75D74}%~ %F{black}%# "
 
 # personal functions
 function listinstances() {
