@@ -1,9 +1,14 @@
 ## zsh installation
 
-`sudo apt install zsh && chsh -s $(which zsh)`
-
+```bash
+sudo apt install zsh && chsh -s $(which zsh)
+```
 Then relog into session
 
+Add this to zshrc:
+```
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+```
 
 ## zsh syntax highlighting and zsh-autosuggestions
 
