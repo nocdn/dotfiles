@@ -1004,3 +1004,10 @@ source ~/.zsh_secrets
 # light mode syntax highlighting
 # source ~/.zsh/dracula-zsh-syntax-highlighting.sh
 # source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# bun completions
+[ -s "/Users/bartek/.bun/_bun" ] && source "/Users/bartek/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
