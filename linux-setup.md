@@ -14,7 +14,7 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 ```bash
 brew install zsh-syntax-highlighting
-echo "source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ${ZDOTDIR:-$HOME}/.zshrc
+echo "source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ${ZDOTDIR:-$HOME}/.zshrc
 ```
 
 ```bash
