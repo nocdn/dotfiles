@@ -51,8 +51,7 @@ zstyle ':completion:*' menu no
 
 # aliases
 alias act='source bin/activate'
-alias nq='networkQuality'
-alias zshconfig="code ~/.zshrc"
+alias zshconfig="nvim ~/.zshrc"
 alias reload="source ~/.zshrc"
 alias hist="cat .zsh_history | fzf | pbcopy"
 
