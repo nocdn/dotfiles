@@ -97,7 +97,7 @@ eval "$(zoxide init --cmd cd zsh)"
 ## Downloading the needed programs:
 
 ```bash
-brew install fzf eza jq wget zoxide
+brew install fzf eza jq wget zoxide rg fd
 ```
 
 ## Docker installation
