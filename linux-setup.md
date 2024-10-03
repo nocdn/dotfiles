@@ -98,5 +98,5 @@ eval "$(zoxide init --cmd cd zsh)"
 downloading the needed programs:
 
 ```bash
-brew install fzf eza jq wget xargs zoxide
+brew install fzf eza jq wget zoxide
 ```
