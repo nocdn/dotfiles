@@ -1,7 +1,7 @@
 ## Zsh installation
 
 ```bash
-sudo apt update && sudo apt upgrade -y && sudo apt install zsh && chsh -s $(which zsh)
+sudo apt update && sudo apt upgrade -y && sudo apt install zsh curl git && chsh -s $(which zsh)
 ```
 Then relog into session
 
@@ -97,7 +97,7 @@ eval "$(zoxide init --cmd cd zsh)"
 ## Downloading the needed programs:
 
 ```bash
-brew install fzf eza jq wget zoxide rg fd
+brew install fzf eza jq wget zoxide rg fd nvim
 ```
 
 ## Docker installation
@@ -115,4 +115,18 @@ sudo docker pull portainer/portainer-ce:latest
 ```
 ```
 sudo docker run -d -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+```
+
+## Npm and Bun
+Node version manager installation
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+```
+Then reload the shell, and run:
+```bash
+nvm install node
+```
+For bun:
+```bash
+curl -fsSL https://bun.sh/install | bash
 ```
