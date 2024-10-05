@@ -1,7 +1,7 @@
 ## Zsh installation
 
 ```bash
-sudo apt install zsh && chsh -s $(which zsh)
+sudo apt update && sudo apt upgrade -y && sudo apt install zsh && chsh -s $(which zsh)
 ```
 Then relog into session
 
