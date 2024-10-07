@@ -86,7 +86,9 @@ bindkey "^[[B" history-search-forward
 # dark theme
 # PS1="%F{white}%n@%m %F{#F38BA8}%~ %F{white}%# %F"
 # light theme
-PS1="%F{black}%n@%m %F{#B75D74}%~ %F{black}%# %F"
+# PS1="%F{black}%n@%m %F{#B75D74}%~ %F{black}%# %F"
+# universal (auto adapts to background color of terminal)
+PS1="%F{reset}%n@%m %F{#B75D74}%~ %F{reset}%# %F"
 
 source <(fzf --zsh)
 
