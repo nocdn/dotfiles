@@ -1,7 +1,7 @@
 ## Zsh installation
 
 ```bash
-sudo apt update && sudo apt upgrade -y && sudo apt install zsh curl git && chsh -s $(which zsh)
+sudo apt update && sudo apt upgrade -y && sudo apt install -y zsh curl git && chsh -s $(which zsh)
 ```
 Then relog into session
 
@@ -11,6 +11,11 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 ```
 
 ## Zsh syntax highlighting and zsh-autosuggestions
+
+Install homebrew first
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
 ```bash
 brew install zsh-syntax-highlighting
