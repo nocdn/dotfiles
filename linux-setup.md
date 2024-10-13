@@ -1,7 +1,7 @@
 ## Zsh installation
 
 ```bash
-sudo apt update && sudo apt upgrade -y && sudo apt install -y zsh curl git zip && chsh -s $(which zsh)
+sudo apt update && sudo apt upgrade -y && sudo apt install -y zsh curl git zip clang && chsh -s $(which zsh)
 ```
 Then relog into session
 
@@ -73,6 +73,7 @@ alias cp='cp -iv'
 alias mv='mv -iv'
 alias cl='clear'
 alias ipinfo='curl -s http://ip-api.com/json/ | jq "."'
+alias python='python3.11'
 
 export EDITOR=/home/linuxbrew/.linuxbrew/bin/nvim
 
@@ -136,4 +137,9 @@ nvm install node
 For bun:
 ```bash
 curl -fsSL https://bun.sh/install | bash
+```
+
+## Uv installation
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
