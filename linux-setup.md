@@ -26,9 +26,9 @@ echo "source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlight
 brew install zsh-autosuggestions
 ```
 
-Add to end of zshrc:
+Run this to add to end of zshrc:
 ```bash
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+echo 'source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh' >> ~/.zshrc
 ```
 
 Then start a new terminal session
