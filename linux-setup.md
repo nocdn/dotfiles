@@ -7,7 +7,7 @@ Then relog into session
 
 Add this to zshrc:
 ```
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.zshrc
 ```
 
 ## Zsh syntax highlighting and zsh-autosuggestions
