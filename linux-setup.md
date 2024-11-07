@@ -1,7 +1,7 @@
 ## Zsh installation
 
 ```bash
-sudo apt update && sudo apt upgrade -y && sudo apt install -y zsh curl git zip clang && chsh -s $(which zsh)
+sudo apt update && sudo apt upgrade -y && sudo apt install -y zsh curl git zip clang build-essential && chsh -s $(which zsh)
 ```
 Then relog into session
 
