@@ -99,9 +99,11 @@ bindkey "^[[B" history-search-forward
 
 # Prompt customization
 # dark theme
-# PS1="%F{white}%n %F{#F38BA8}%~ %F{white}%# %F{reset}"
+# PS1="%F{white}%n@%m %F{#F38BA8}%~ %F{white}%# %F"
 # light theme
-PS1="%F{black}%n %F{#B75D74}%~ %F{black}%# %F{reset}"
+# PS1="%F{black}%n@%m %F{#B75D74}%~ %F{black}%# %F"
+# universal (auto adapts to background color of terminal)
+PS1="%F{reset}%n@%m %F{#B75D74}%~ %F{reset}%# %F"
 
 # personal functions
 function listinstances() {
@@ -331,7 +333,7 @@ function convert_to_iso8601_llm() {
       \"messages\": [
         {
           \"role\": \"system\",
-          \"content\": \"You convert dates given in natural language into iso8601 format. Output just the date in iso8601 format. The current date is $current_date.\"
+          \"content\": \"You convert dates given in natural language into iso8601 format. Output just the date in iso8601 format. Make sure to use the year 2024. The current date is $current_date.\"
         },
         {
           \"role\": \"user\",
@@ -422,70 +424,6 @@ function gcp() {
 
     # push changes
     git push
-}
-
-upload() {
-    local short=false
-    local file_path=""
-
-    # Check for help flag
-    if [[ "$1" == "--help" ]]; then
-        echo "\nUsage: upload [-s|--short] <file_path>"
-        echo
-        echo "Description:"
-        echo "  Uploads a file to a file hosting service and copies the URL to the clipboard."
-        echo
-        echo "Options:"
-        echo "  -s, --short    Generate and output a shortened URL"
-        echo "  --help         Display this help message"
-        echo
-        echo "Details:"
-        echo "  - For files up to 99MB, uploads to waifuvault.moe"
-        echo "  - For files over 99MB, uploads to 0x0.st"
-        echo "  - The resulting URL is automatically copied to the clipboard"
-        echo "  - If -s or --short flag used, a shortened URL is generated, copied instead\n"
-        return 0
-    fi
-
-    # parse arguments
-    while [[ "$#" -gt 0 ]]; do
-        case $1 in
-            -s|--short) short=true ;;
-            *) file_path="$1" ;;
-        esac
-        shift
-    done
-    # check if file path is provided
-    if [[ -z "$file_path" ]]; then
-        echo "Usage: upload [-s|--short] <file_path>"
-        echo "Use 'upload --help' for more information."
-        return 1
-    fi
-    # Get file size in bytes
-    local file_size=$(stat -f%z "$file_path")
-    local size_limit=$((99 * 1024 * 1024))  # 99MB in bytes
-    local upload_url=""
-    if [ "$file_size" -gt "$size_limit" ]; then
-        # Use 0x0 for files over 99MB
-        upload_url=$(curl -s -F "file=@$file_path" https://0x0.st)
-    else
-        # Use waifuvault.moe for files 99MB or smaller
-        local base_url="https://waifuvault.moe/rest?expires=2m"
-        upload_url=$(curl --progress-bar --request PUT --url "$base_url" \
-                            --header 'Content-Type: multipart/form-data' \
-                            --form file=@"$file_path" | jq -r .url)
-    fi
-    # Log upload URL
-    echo "$upload_url"
-    # copy upload URL to clipboard
-    echo "$upload_url" | pbcopy
-
-    # do URL shortening if -s or --short flag passed
-    if $short; then
-        local short_url=$(curl -s "https://is.gd/create.php?format=simple&url=$upload_url")
-        echo "$short_url" | pbcopy
-        echo "$short_url"
-    fi
 }
 
 transcribe() {
@@ -986,6 +924,78 @@ plikd_upload() {
     echo "$OUTPUT" | pbcopy
 
     echo "$OUTPUT"
+}
+
+transfer() {
+    # Check if arguments were provided
+    if [ $# -eq 0 ]; then
+        echo "No arguments specified.\nUsage:\n transfer <file|directory>\n ... | transfer <file_name>" >&2
+        return 1
+    fi
+
+    # Check if input is from terminal or pipe
+    if tty -s; then
+        file="$1"
+        file_name=$(basename "$file")
+
+        # Verify file exists
+        if [ ! -e "$file" ]; then
+            echo "$file: No such file or directory" >&2
+            return 1
+        fi
+
+        # Handle directory vs file
+        if [ -d "$file" ]; then
+            file_name="$file_name.zip"
+            (cd "$file" && zip -r -q - .) | curl --progress-bar --upload-file "-" "http://45.90.97.46:9080/$file_name" | tee /dev/null
+        else
+            cat "$file" | curl --progress-bar --upload-file "-" "http://45.90.97.46:9080/$file_name" | tee /dev/null
+        fi
+    else
+        # Handle piped input
+        file_name=$1
+        curl --progress-bar --upload-file "-" "http://45.90.97.46:9080/$file_name" | tee /dev/null
+    fi
+}
+
+
+# Function to upload a file to https://0x0.st, output the download link, and copy it to clipboard
+upload() {
+  # Check if a file path is provided
+  if [[ -z "$1" ]]; then
+    echo "Usage: upload_file <file>"
+    return 1
+  fi
+
+  # Extract the filename from the path
+  local file_path="$1"
+  local filename=$(basename "$file_path")
+
+  # Check if the file exists
+  if [[ ! -f "$file_path" ]]; then
+    return 1
+  fi
+
+  # Upload the file and capture the returned URL
+  local response=$(curl -s -F "file=@${file_path}" https://0x0.st)
+
+  # Check if upload was successful
+  if [[ $response == *"https://0x0.st/"* ]]; then
+    # Append the original filename to make the link accessible with the same name
+    local download_link="${response}/${filename}"
+    
+    # Output the link
+    echo "$download_link"
+    
+    # Copy the link to clipboard
+    if command -v pbcopy &>/dev/null; then
+      echo "$download_link" | pbcopy
+    elif command -v xclip &>/dev/null; then
+      echo "$download_link" | xclip -selection clipboard
+    fi
+  else
+    return 1
+  fi
 }
 
 source <(fzf --zsh)
