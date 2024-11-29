@@ -895,7 +895,7 @@ function sox_audio() {
     output_file="${base_name}(sox).${extension}"
 
     # Use sox to perform the audio conversion
-    sox "$input_file" "$output_file" vol 0.8 bass +2 reverb 25 50 100 100 0 0
+    sox "$input_file" "$output_file" vol 0.8 bass +2 reverb 50 50 100 100 0.5 2
 
     echo "Conversion completed: $output_file"
 }
@@ -905,18 +905,18 @@ plikd_upload() {
         echo "Usage: upload_file <file_path>"
         return 1
     fi
-    
+
     FILE_PATH="$1"
-    
+
     # make sure file exists
     if [[ ! -f "$FILE_PATH" ]]; then
         echo "Error: File '$FILE_PATH' not found!"
         return 1
     fi
-    
+
     # run curl command silently and save output
     OUTPUT=$(curl -s --form "file=@$FILE_PATH" http://185.44.64.170:8080)
-    
+
     # replace '127.0.0.1' with '185.44.64.170' if it appears in command output
     OUTPUT=${OUTPUT//127.0.0.1/185.44.64.170}
 
@@ -983,10 +983,10 @@ upload() {
   if [[ $response == *"https://0x0.st/"* ]]; then
     # Append the original filename to make the link accessible with the same name
     local download_link="${response}/${filename}"
-    
+
     # Output the link
     echo "$download_link"
-    
+
     # Copy the link to clipboard
     if command -v pbcopy &>/dev/null; then
       echo "$download_link" | pbcopy
