@@ -5,7 +5,7 @@ sudo apt update && sudo apt upgrade -y && sudo apt install -y zsh curl git zip c
 ```
 Then relog into session
 
-Add this to zshrc:
+Run this to add it to zshrc:
 ```
 echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.zshrc
 ```
@@ -115,7 +115,7 @@ sudo apt-get update && sudo apt-get install ca-certificates curl && sudo install
 ```
 Actually installing docker:
 ```bash
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 (Optional) portainer installation:
 ```
