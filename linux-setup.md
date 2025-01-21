@@ -1,7 +1,7 @@
 ## Zsh installation
 
 ```bash
-sudo apt update && sudo apt upgrade -y && sudo apt install -y zsh curl git zip clang build-essential && chsh -s $(which zsh)
+sudo apt update && sudo apt upgrade -y && sudo apt install -y zsh curl git zip clang build-essential neovim && chsh -s $(which zsh)
 ```
 Then relog into session
 
@@ -74,8 +74,11 @@ alias mv='mv -iv'
 alias cl='clear'
 alias ipinfo='curl -s http://ip-api.com/json/ | jq "."'
 alias python='python3.11'
+alias brd='bun run dev'
+alias brb='bun run build'
+alias bi='bun install'
 
-export EDITOR=/home/linuxbrew/.linuxbrew/bin/nvim
+export EDITOR=nvim
 
 autoload -z edit-command-line
 zle -N edit-command-line
@@ -94,7 +97,7 @@ bindkey "^[[B" history-search-forward
 # light theme
 # PS1="%F{black}%n@%m %F{#B75D74}%~ %F{black}%# %F"
 # universal (auto adapts to background color of terminal)
-PS1="%F{reset}%n@%m %F{#B75D74}%~ %F{reset}%# %F"
+# PS1="%F{reset}%n@%m %F{#B75D74}%~ %F{reset}%# %F"
 
 source <(fzf --zsh)
 
@@ -105,7 +108,7 @@ eval "$(zoxide init --cmd cd zsh)"
 ## Downloading the needed programs:
 
 ```bash
-brew install fzf eza jq wget zoxide rg fd nvim
+brew install fzf eza jq wget zoxide rg fd
 ```
 
 ## Docker installation
