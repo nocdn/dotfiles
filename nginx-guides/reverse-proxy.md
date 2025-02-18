@@ -3,7 +3,7 @@
 Create a new file in `/etc/nginx/sites-available/`:
 
 ```bash
-sudo nano /etc/nginx/sites-available/[subdomain].bartoszbak.org
+sudo nvim /etc/nginx/sites-available/[subdomain].bartoszbak.org
 ```
 
 Add this to the file:
