@@ -26,6 +26,8 @@ export PATH=~/.npm-global/bin:$PATH
 export PATH="/Users/bartek/.local/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
 
+alias docker="/Applications/Docker.app/Contents/Resources/bin/docker"
+
 # from https://peterlyons.com/problog/2018/01/zsh-lazy-loading/
 # placeholder nvm shell function
 # On first use, it will set nvm up properly which will replace the `nvm`
@@ -69,6 +71,8 @@ alias cp='cp -iv'
 alias mv='mv -iv'
 alias cl='clear'
 alias ipinfo='curl -s http://ip-api.com/json/ | jq "."'
+alias brd='bun run dev'
+alias brb='bun run build'
 
 export EDITOR=/opt/homebrew/bin/nvim
 
@@ -103,7 +107,9 @@ bindkey "^[[B" history-search-forward
 # light theme
 # PS1="%F{black}%n@%m %F{#B75D74}%~ %F{black}%# %F"
 # universal (auto adapts to background color of terminal)
-PS1="%F{reset}%n@%m %F{#B75D74}%~ %F{reset}%# %F"
+# ↓ includes hostname
+# PS1="%F{reset}%n@%m %F{#B75D74}%~ %F{reset}%# %F"
+PS1="%F{reset}%n %F{blue}%~ %F{reset}%# %F"
 
 # personal functions
 function listinstances() {
@@ -160,6 +166,12 @@ function tempinstance() {
 
     echo "Disk size set to: ${disk_size}GB"
 
+    echo -n "Enter a name for the instance: "
+    read instance_name
+    if [[ -z "$instance_name" ]]; then
+        instance_name="testing-instance"
+    fi
+
     # Define the path to the SSH key file
     local ssh_key_file=~/latest-server-ssh-key.pub
 
@@ -173,7 +185,7 @@ function tempinstance() {
     fi
 
     # Run the gcloud command with the selected instance type, disk type, and size
-    gcloud compute instances create testing-instance \
+    gcloud compute instances create $instance_name \
         --zone=europe-west2-a \
         --machine-type=$selected_type \
         --boot-disk-type=$disk_type \
@@ -426,120 +438,7 @@ function gcp() {
     git push
 }
 
-transcribe() {
-    # Check for help flag
-    if [[ "$1" == "--help" ]]; then
-        echo "\nUsage: transcribe [-f|--file <file_path>] [-yt|--youtube <youtube_url>] [<file_url>] [-o|--output <output_file>]"
-        echo "Transcribes audio from a file, YouTube URL, or URL using fal.ai Wizper service."
-        return 0
-    fi
-
-    local file_url=""
-    local is_local=false
-    local is_youtube=false
-    local output_file=""
-
-    # Parse arguments
-    while [[ "$#" -gt 0 ]]; do
-        case $1 in
-            -f|--file)
-                is_local=true
-                file_url="$2"
-                shift 2
-                ;;
-            -yt|--youtube)
-                is_youtube=true
-                file_url="$2"
-                shift 2
-                ;;
-            -o|--output)
-                output_file="$2"
-                shift 2
-                ;;
-            *)
-                file_url="$1"
-                shift
-                ;;
-        esac
-    done
-
-    # If the -f flag is present, upload the file first
-    if $is_local; then
-        if [[ -z "$file_url" ]]; then
-            echo "Error: No file path provided."
-            return 1
-        fi
-        file_url=$(upload "$file_url")
-        if [[ $? -ne 0 ]]; then
-            echo "File upload failed."
-            return 1
-        fi
-    fi
-
-    # If the -yt flag is present, extract the download URL from YouTube link
-    if $is_youtube; then
-        if [[ -z "$file_url" ]]; then
-            echo "Error: No YouTube URL provided."
-            return 1
-        fi
-        local cobalt_response=$(curl -s --request POST \
-            --url https://api.cobalt.tools/api/json \
-            --header "Accept: application/json" \
-            --header "Content-Type: application/json" \
-            --data '{
-                "url": "'"$file_url"'",
-                "audioFormat": "mp3",
-                "downloadMode": "audio"
-            }')
-
-        file_url=$(echo "$cobalt_response" | jq -r '.url')
-
-        if [[ -z "$file_url" || "$file_url" == "null" ]]; then
-            echo "Error: Failed to extract download URL from YouTube."
-            return 1
-        fi
-    fi
-
-    # If no file URL is provided, error out
-    if [[ -z "$file_url" ]]; then
-        echo "Error: No file URL provided."
-        return 1
-    fi
-
-    # Encode the file URL to handle spaces
-    encoded_url=$(echo "$file_url" | sed 's/ /%20/g')
-
-    # Perform transcription using fal.ai Wizper
-    local transcription=$(curl -s --request POST \
-        --url https://fal.run/fal-ai/wizper \
-        --header "Authorization: Key $FAL_KEY" \
-        --header "Content-Type: application/json" \
-        --data '{
-            "audio_url": "'"$encoded_url"'",
-            "language": "en",
-            "version": "3",
-            "task": "transcribe"
-        }' | jq .text -r)
-
-    # If transcription fails, handle it
-    if [[ -z "$transcription" || "$transcription" == "null" ]]; then
-        echo "Error: Transcription failed."
-        return 1
-    fi
-
-    # Output transcription to terminal
-    echo "$transcription"
-
-    # Copy transcription to clipboard
-    echo "$transcription" | pbcopy
-
-    # If output file is specified, save transcription to file
-    if [[ -n "$output_file" ]]; then
-        echo "$transcription" > "$output_file"
-    fi
-}
-
-function compressAudio() {
+function cmprss() {
     # check if input file is provided
     if [[ $# -eq 0 ]]; then
         echo "usage: compress_audio <input_file>"
@@ -547,6 +446,7 @@ function compressAudio() {
     fi
 
     input_file="$1"
+    input_ext="${input_file##*.}"
 
     # ask for parameters
     read "bitrate?enter bitrate (default: 16k): "
@@ -563,8 +463,12 @@ function compressAudio() {
     # get input filename without extension
     filename=$(basename "$input_file" | sed 's/\.[^.]*$//')
 
-    # construct output filename
-    output_file="${filename}.${format}"
+    # construct output filename - add (compressed) if format is same as input extension
+    if [[ "$format" == "$input_ext" ]]; then
+        output_file="${filename}(compressed).${format}"
+    else
+        output_file="${filename}.${format}"
+    fi
 
     # run ffmpeg command with speed adjustment
     if (( $(echo "$speed_multiplier == 1" | bc -l) )); then
@@ -680,203 +584,6 @@ github_repo_init() {
     echo "Repository $repo_name has been created and pushed to GitHub."
 }
 
-function combine() {
-    local dir="."
-    local use_tree=false
-    local output_file=""
-    local output=""
-
-    # parse options
-    while getopts ":to:" opt; do
-        case ${opt} in
-            t ) use_tree=true ;;
-            o ) output_file=$OPTARG ;;
-            \? ) echo "Usage: combine [-t] [-o output_file] [directory]"; return 1 ;;
-        esac
-    done
-    shift $((OPTIND -1))
-
-    # set directory if provided
-    [[ $1 ]] && dir="$1"
-
-    # blacklist of files/directories to exclude
-    local blacklist=(
-        ".git"
-        ".gitignore"
-        ".css.map"
-        ".DS_Store"
-        "node_modules"
-        ".env"
-        ".vscode"
-        ".idea"
-        "*.log"
-        "*.tmp"
-        "*.temp"
-        "*.swp"
-        "*.swo"
-        "*.bak"
-        "*.cache"
-        ".jpeg"
-        ".png"
-        ".jpg"
-    )
-
-    # create grep patterns from blacklist
-    local grep_patterns=()
-    for item in "${blacklist[@]}"; do
-        grep_patterns+=("-e" "$(printf '%s' "$item" | sed 's/[.[\*^$/]/\\&/g')")
-    done
-
-    # add tree output if requested
-    if $use_tree; then
-        if command -v tree >/dev/null 2>&1; then
-            output+="# Directory structure:\n\n"
-            output+="$(tree -L 2 "$dir")\n\n\n"
-        else
-            echo "tree command not found. Skipping directory structure."
-        fi
-    fi
-
-    # find all files recursively, excluding blacklisted items
-    while IFS= read -r file; do
-        # get relative path
-        local rel_path="${file#$dir/}"
-
-        # add formatted header and file contents to output
-        output+="# $rel_path contents:\n\n"
-        output+="$(cat "$file")\n\n\n"
-    done < <(find "$dir" -type f | grep -v "${grep_patterns[@]}")
-
-    # output and copy to clipboard
-    echo -e "$output" | tee >(pbcopy)
-
-    # save to file if requested
-    if [[ -n "$output_file" ]]; then
-        echo -e "$output" > "$output_file"
-        echo "Output saved to $output_file"
-    fi
-}
-
-ytdl() {
-    local url
-    if [[ -z "$1" ]]; then
-        echo -n "Enter YouTube URL: "
-        read -r url
-    else
-        url="$1"
-    fi
-
-    local type
-    type=$(echo -e "video\naudio" | fzf --prompt="Select type: " --header="↑↓:move ↵:select" --height=5 --layout=reverse)
-
-    local format_option quality_option
-    if [[ "$type" == "audio" ]]; then
-        local aFormat
-        aFormat=$(echo -e "mp3\nogg\nwav\nopus" | fzf --prompt="Select audio format: " --header="↑↓:move ↵:select" --height=7 --layout=reverse)
-        format_option="--extract-audio --audio-format $aFormat"
-        quality_option="--audio-quality 0"
-    else
-        local vQuality
-        vQuality=$(echo -e "1080\n1440\nmax\n144\n240\n360\n480\n720\n2160" | fzf --prompt="Select video quality: " --header="↑↓:move ↵:select" --height=12 --layout=reverse)
-        if [[ "$vQuality" == "max" ]]; then
-            format_option="-f bestvideo+bestaudio/best"
-        else
-            format_option="-f bestvideo[height<=$vQuality]+bestaudio/best[height<=$vQuality]"
-        fi
-        quality_option=""
-    fi
-    echo "Downloading ${type}..."
-
-    yt-dlp \
-        $format_option \
-        $quality_option \
-        --external-downloader aria2c \
-        --external-downloader-args "-x 16 -s 16 -k 1M" \
-        -o "%(title)s.%(ext)s" \
-        --no-playlist \
-        --embed-thumbnail \
-        --add-metadata \
-        --no-warnings \
-        --ignore-errors \
-        "$url"
-
-    echo "Download complete!"
-}
-
-pythondev() {
-    # Ask for environment name
-    read "env_name?Enter a name for your Python environment: "
-
-    # Select Python version using fzf
-    local python_version=$(echo "3.10\n3.11\n3.12" | fzf --height=5 --prompt="Select Python version: ")
-
-    # Ask if user wants to create files
-    local create_files=$(echo "no\nyes" | fzf --height=4 --prompt="Do you want to create Python files? ")
-
-    local file_names=""
-    if [[ $create_files == "yes" ]]; then
-        read "file_names?Enter the names of the Python files to create (comma-separated): "
-    fi
-
-    # Create and activate the virtual environment
-    python$python_version -m venv $env_name
-    cd $env_name
-    source bin/activate
-
-    # Create the Python files if requested
-    if [[ $create_files == "yes" ]]; then
-        IFS=',' read -r -A files <<< "$file_names"
-        for file in "${files[@]}"; do
-            file=$(echo $file | xargs)  # Trim whitespace
-            if [[ -n "$file" ]]; then
-                touch "$file"
-                echo "Created file: $file"
-            fi
-        done
-    fi
-
-    echo "Python $python_version environment '$env_name' is now active."
-}
-
-typetext() {
-    local wait_time=2  # Default wait time
-
-    # Parse options
-    while getopts ":t:" opt; do
-        case $opt in
-            t)
-                wait_time=$OPTARG
-                ;;
-            \?)
-                echo "Invalid option: -$OPTARG" >&2
-                return 1
-                ;;
-            :)
-                echo "Option -$OPTARG requires an argument." >&2
-                return 1
-                ;;
-        esac
-    done
-    shift $((OPTIND-1))
-
-    read "text_type?Text to type: "
-
-    echo "Waiting for $wait_time seconds..."
-    sleep "$wait_time"
-
-    # type the text using osascript
-    osascript -e "tell application \"System Events\" to keystroke \"$text_type\""
-}
-
-function yy() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		builtin cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
-}
-
 function sox_audio() {
     # Check if a file argument is provided
     if [ -z "$1" ]; then
@@ -900,65 +607,6 @@ function sox_audio() {
     echo "Conversion completed: $output_file"
 }
 
-plikd_upload() {
-    if [[ -z "$1" ]]; then
-        echo "Usage: upload_file <file_path>"
-        return 1
-    fi
-
-    FILE_PATH="$1"
-
-    # make sure file exists
-    if [[ ! -f "$FILE_PATH" ]]; then
-        echo "Error: File '$FILE_PATH' not found!"
-        return 1
-    fi
-
-    # run curl command silently and save output
-    OUTPUT=$(curl -s --form "file=@$FILE_PATH" http://185.44.64.170:8080)
-
-    # replace '127.0.0.1' with '185.44.64.170' if it appears in command output
-    OUTPUT=${OUTPUT//127.0.0.1/185.44.64.170}
-
-
-    echo "$OUTPUT" | pbcopy
-
-    echo "$OUTPUT"
-}
-
-transfer() {
-    # Check if arguments were provided
-    if [ $# -eq 0 ]; then
-        echo "No arguments specified.\nUsage:\n transfer <file|directory>\n ... | transfer <file_name>" >&2
-        return 1
-    fi
-
-    # Check if input is from terminal or pipe
-    if tty -s; then
-        file="$1"
-        file_name=$(basename "$file")
-
-        # Verify file exists
-        if [ ! -e "$file" ]; then
-            echo "$file: No such file or directory" >&2
-            return 1
-        fi
-
-        # Handle directory vs file
-        if [ -d "$file" ]; then
-            file_name="$file_name.zip"
-            (cd "$file" && zip -r -q - .) | curl --progress-bar --upload-file "-" "http://45.90.97.46:9080/$file_name" | tee /dev/null
-        else
-            cat "$file" | curl --progress-bar --upload-file "-" "http://45.90.97.46:9080/$file_name" | tee /dev/null
-        fi
-    else
-        # Handle piped input
-        file_name=$1
-        curl --progress-bar --upload-file "-" "http://45.90.97.46:9080/$file_name" | tee /dev/null
-    fi
-}
-
-
 # Function to upload a file to https://0x0.st, output the download link, and copy it to clipboard
 upload() {
   # Check if a file path is provided
@@ -977,7 +625,7 @@ upload() {
   fi
 
   # Upload the file and capture the returned URL
-  local response=$(curl -s -F "file=@${file_path}" https://0x0.st)
+  local response=$(curl --progress-bar -F "file=@${file_path}" https://0x0.st)
 
   # Check if upload was successful
   if [[ $response == *"https://0x0.st/"* ]]; then
@@ -996,6 +644,117 @@ upload() {
   else
     return 1
   fi
+}
+
+combine_files_code() {
+  local combined_output=""
+  local file
+
+  if [[ $# -eq 0 ]]; then
+    echo "Usage: combine_files <file1> [file2] [...] or combine_files *" >&2
+    return 1
+  fi
+
+  if [[ "$1" == "*" ]]; then
+    # If the argument is *, process all files in the current directory
+    for file in *; do
+      if [[ -f "$file" ]]; then
+        combined_output+="---------------------------------------------------\n"
+        combined_output+="$file:\n"
+        combined_output+="---------------------------------------------------\n"
+        combined_output+=$(nl -ba -s " | " "$file")
+        combined_output+="\n\n"
+      fi
+    done
+  else
+    # Otherwise, process the files provided as arguments
+    for file in "$@"; do
+      if [[ -f "$file" ]]; then
+        combined_output+="---------------------------------------------------\n"
+        combined_output+="$file:\n"
+        combined_output+="---------------------------------------------------\n"
+        combined_output+=$(nl -ba -s " | " "$file")
+        combined_output+="\n\n"
+      else
+        echo "Error: File '$file' not found or not a regular file." >&2
+        # Continue to the next file instead of exiting
+      fi
+    done
+  fi
+
+  if [[ -z "$combined_output" ]]; then
+    echo "No regular files found to process." >&2
+    return 1
+  fi
+
+  echo "$combined_output" | pbcopy
+  echo "$combined_output"
+}
+
+combine_files() {
+  local combined_output=""
+  local file
+  
+  # Define blacklist patterns
+  local blacklist_patterns=(
+    "*.jpg" "*.jpeg" "*.png" "*.gif" "*.bmp"  # Images
+    "*.mp3" "*.wav" "*.ogg" "*.m4a" "*.aac"   # Audio
+    "*.mp4" "*.avi" "*.mov" "*.wmv"           # Video
+    "*.pdf" "*.doc" "*.docx"                  # Documents
+  )
+  
+  if [[ $# -eq 0 ]]; then
+    echo "Usage: combine_files <file1> [file2] [...] or combine_files *" >&2
+    return 1
+  fi
+
+  # Function to check if file matches any blacklist pattern
+  is_blacklisted() {
+    local file="$1"
+    local pattern
+    for pattern in "${blacklist_patterns[@]}"; do
+      if [[ "$file" == ${~pattern} ]]; then  # Enable pattern matching
+        return 0  # File is blacklisted
+      fi
+    done
+    return 1  # File is not blacklisted
+  }
+
+  if [[ "$1" == "*" ]]; then
+    # Process all files in current directory except blacklisted ones
+    for file in *; do
+      if [[ -f "$file" ]] && ! is_blacklisted "$file"; then
+        combined_output+="---------------------------------------------------\n"
+        combined_output+="$file:\n"
+        combined_output+="---------------------------------------------------\n"
+        combined_output+="$(cat "$file")\n\n"
+      fi
+    done
+  else
+    # Process specified files except blacklisted ones
+    for file in "$@"; do
+      if [[ -f "$file" ]]; then
+        if ! is_blacklisted "$file"; then
+          combined_output+="---------------------------------------------------\n"
+          combined_output+="$file:\n"
+          combined_output+="---------------------------------------------------\n"
+          combined_output+="$(cat "$file")\n\n"
+        else
+          echo "Skipping blacklisted file: $file" >&2
+        fi
+      else
+        echo "Error: File '$file' not found or not a regular file." >&2
+      fi
+    done
+  fi
+
+  if [[ -z "$combined_output" ]]; then
+    echo "No eligible files found to process." >&2
+    return 1
+  fi
+  
+  echo -e "$combined_output" | pbcopy
+  echo -e "$combined_output"
 }
 
 source <(fzf --zsh)
@@ -1029,3 +788,22 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/opt/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/opt/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
