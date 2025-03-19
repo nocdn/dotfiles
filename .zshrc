@@ -646,115 +646,176 @@ upload() {
   fi
 }
 
-combine_files_code() {
-  local combined_output=""
-  local file
+combine_files () {
+  # usage: combine_files [-r] file_or_directory1 file_or_directory2 ...
+  local recursive=0
+  local targets=()
 
-  if [[ $# -eq 0 ]]; then
-    echo "Usage: combine_files <file1> [file2] [...] or combine_files *" >&2
-    return 1
+  # parse options: -r means process directories recursively
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -r)
+        recursive=1
+        shift
+        ;;
+      *)
+        targets+=("$1")
+        shift
+        ;;
+    esac
+  done
+
+  # use a temporary file for output
+  local tmp_output
+  tmp_output=$(mktemp)
+
+  # check once if we are inside a git repository
+  local inside_git=0
+  if git rev-parse --is-inside-work-tree &> /dev/null; then
+    inside_git=1
   fi
 
-  if [[ "$1" == "*" ]]; then
-    # If the argument is *, process all files in the current directory
-    for file in *; do
-      if [[ -f "$file" ]]; then
-        combined_output+="---------------------------------------------------\n"
-        combined_output+="$file:\n"
-        combined_output+="---------------------------------------------------\n"
-        combined_output+=$(nl -ba -s " | " "$file")
-        combined_output+="\n\n"
-      fi
-    done
-  else
-    # Otherwise, process the files provided as arguments
-    for file in "$@"; do
-      if [[ -f "$file" ]]; then
-        combined_output+="---------------------------------------------------\n"
-        combined_output+="$file:\n"
-        combined_output+="---------------------------------------------------\n"
-        combined_output+=$(nl -ba -s " | " "$file")
-        combined_output+="\n\n"
-      else
-        echo "Error: File '$file' not found or not a regular file." >&2
-        # Continue to the next file instead of exiting
-      fi
-    done
+  # define default directory exclusions
+  local exclude_dirs=(".git" "node_modules" "venv" "dist")
+
+  # if not inside git, check global gitignore; if any pattern ends with /, consider it a dir to skip
+  if (( ! inside_git )); then
+    local global_ignore
+    global_ignore=$(git config --get core.excludesfile 2>/dev/null)
+    if [[ -n "$global_ignore" && -f "$global_ignore" ]]; then
+      while IFS= read -r pattern; do
+        # trim whitespace; skip empty lines and comments
+        pattern=$(echo "$pattern" | sed 's/^\s*//;s/\s*$//')
+        [[ -z "$pattern" || "$pattern" == \#* ]] && continue
+        # if pattern ends with / then treat it as a dir exclusion
+        if [[ "$pattern" == */ ]]; then
+          pattern="${pattern%/}"  # remove trailing slash
+          local found=0
+          for ed in "${exclude_dirs[@]}"; do
+            if [[ "$ed" == "$pattern" ]]; then
+              found=1
+              break
+            fi
+          done
+          if (( ! found )); then
+            exclude_dirs+=("$pattern")
+          fi
+        fi
+      done < "$global_ignore"
+    fi
   fi
 
-  if [[ -z "$combined_output" ]]; then
-    echo "No regular files found to process." >&2
-    return 1
+  # load global_patterns array (all patterns) from global gitignore for file-level checks;
+  # note: we already incorporated patterns ending with / into directory exclusions
+  local global_patterns=()
+  if (( ! inside_git )); then
+    local global_ignore
+    global_ignore=$(git config --get core.excludesfile 2>/dev/null)
+    if [[ -n "$global_ignore" && -f "$global_ignore" ]]; then
+      while IFS= read -r pattern; do
+        pattern=$(echo "$pattern" | sed 's/^\s*//;s/\s*$//')
+        [[ -z "$pattern" || "$pattern" == \#* ]] && continue
+        global_patterns+=("$pattern")
+      done < "$global_ignore"
+    fi
   fi
 
-  echo "$combined_output" | pbcopy
-  echo "$combined_output"
-}
-
-combine_files() {
-  local combined_output=""
-  local file
-  
-  # Define blacklist patterns
-  local blacklist_patterns=(
-    "*.jpg" "*.jpeg" "*.png" "*.gif" "*.bmp"  # Images
-    "*.mp3" "*.wav" "*.ogg" "*.m4a" "*.aac"   # Audio
-    "*.mp4" "*.avi" "*.mov" "*.wmv"           # Video
-    "*.pdf" "*.doc" "*.docx"                  # Documents
-  )
-  
-  if [[ $# -eq 0 ]]; then
-    echo "Usage: combine_files <file1> [file2] [...] or combine_files *" >&2
-    return 1
-  fi
-
-  # Function to check if file matches any blacklist pattern
-  is_blacklisted() {
+  # helper function: process an individual file and append its content to tmp_output
+  process_file() {
     local file="$1"
-    local pattern
-    for pattern in "${blacklist_patterns[@]}"; do
-      if [[ "$file" == ${~pattern} ]]; then  # Enable pattern matching
-        return 0  # File is blacklisted
+
+    # ensure file is a regular file
+    if [[ ! -f "$file" ]]; then
+      return
+    fi
+
+    # extra check: skip if file path contains an excluded directory (safety net)
+    for ed in "${exclude_dirs[@]}"; do
+      if [[ "$file" == *"/$ed/"* ]]; then
+        return
       fi
     done
-    return 1  # File is not blacklisted
+
+    # ensure file is text-based (or empty) using file command
+    local mime
+    mime=$(file -b --mime "$file")
+    if [[ $mime != text/* && $mime != *empty* ]]; then
+      return
+    fi
+
+    # if inside a git repo, use git check-ignore
+    if (( inside_git )); then
+      if git check-ignore -q "$file"; then
+        return
+      fi
+    else
+      # otherwise, check against any file pattern from global gitignore (skip those not for directories)
+      if [[ ${#global_patterns[@]} -gt 0 ]]; then
+        for pattern in "${global_patterns[@]}"; do
+          [[ "$pattern" == */ ]] && continue
+          if [[ "$file" == *"$pattern"* ]]; then
+            return
+          fi
+        done
+      fi
+    fi
+
+    {
+      echo "------------------"
+      if command -v realpath > /dev/null; then
+        realpath "$file"
+      else
+        perl -MCwd -e 'print Cwd::abs_path(shift)' "$file"
+      fi
+      echo "------------------"
+      cat "$file"
+      echo ""
+    } >> "$tmp_output"
   }
 
-  if [[ "$1" == "*" ]]; then
-    # Process all files in current directory except blacklisted ones
-    for file in *; do
-      if [[ -f "$file" ]] && ! is_blacklisted "$file"; then
-        combined_output+="---------------------------------------------------\n"
-        combined_output+="$file:\n"
-        combined_output+="---------------------------------------------------\n"
-        combined_output+="$(cat "$file")\n\n"
+  # process each target
+  if (( recursive )); then
+    for target in "${targets[@]}"; do
+      if [[ -d "$target" ]]; then
+        # build an array of find arguments with directory pruning
+        local find_args=()
+        find_args+=( "$target" )
+        find_args+=( \( -type d \( )
+        local first=1
+        for ed in "${exclude_dirs[@]}"; do
+          if (( first )); then
+            find_args+=( -name "$ed" )
+            first=0
+          else
+            find_args+=( -o -name "$ed" )
+          fi
+        done
+        find_args+=( \) -prune \) -o -type f -print )
+        # use find to list files without recursing into the excluded directories
+        find "${find_args[@]}" | while IFS= read -r f; do
+          process_file "$f"
+        done
+      elif [[ -f "$target" ]]; then
+        process_file "$target"
+      else
+        echo "warning: $target is not a valid file or directory, skipping." 1>&2
       fi
     done
   else
-    # Process specified files except blacklisted ones
-    for file in "$@"; do
-      if [[ -f "$file" ]]; then
-        if ! is_blacklisted "$file"; then
-          combined_output+="---------------------------------------------------\n"
-          combined_output+="$file:\n"
-          combined_output+="---------------------------------------------------\n"
-          combined_output+="$(cat "$file")\n\n"
-        else
-          echo "Skipping blacklisted file: $file" >&2
-        fi
+    # non-recursive; process only if target is a file
+    for target in "${targets[@]}"; do
+      if [[ -f "$target" ]]; then
+        process_file "$target"
       else
-        echo "Error: File '$file' not found or not a regular file." >&2
+        echo "warning: $target is not a file, skipping." 1>&2
       fi
     done
   fi
 
-  if [[ -z "$combined_output" ]]; then
-    echo "No eligible files found to process." >&2
-    return 1
-  fi
-  
-  echo -e "$combined_output" | pbcopy
-  echo -e "$combined_output"
+  # copy combined output to clipboard (macOS pbcopy) and also display it
+  pbcopy < "$tmp_output"
+  cat "$tmp_output"
+  rm "$tmp_output"
 }
 
 source <(fzf --zsh)
@@ -792,18 +853,3 @@ esac
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
-
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/opt/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/opt/anaconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/opt/anaconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
