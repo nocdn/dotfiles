@@ -1,3 +1,5 @@
+# Add deno completions to search path
+if [[ ":$FPATH:" != *":/Users/bartek/.zsh/completions:"* ]]; then export FPATH="/Users/bartek/.zsh/completions:$FPATH"; fi
 # zsh Autosuggestions plugin manual installation
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 
@@ -27,6 +29,8 @@ export PATH="/Users/bartek/.local/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
 
 alias docker="/Applications/Docker.app/Contents/Resources/bin/docker"
+
+export MINIO_CONFIG_ENV_FILE=/etc/default/minio
 
 # from https://peterlyons.com/problog/2018/01/zsh-lazy-loading/
 # placeholder nvm shell function
@@ -73,6 +77,7 @@ alias cl='clear'
 alias ipinfo='curl -s http://ip-api.com/json/ | jq "."'
 alias brd='bun run dev'
 alias brb='bun run build'
+alias py='python3'
 
 export EDITOR=/opt/homebrew/bin/nvim
 
@@ -676,7 +681,7 @@ combine_files () {
   fi
 
   # define default directory exclusions
-  local exclude_dirs=(".git" "node_modules" "venv" "dist")
+  local exclude_dirs=(".git" "node_modules" "venv" "dist" "build" ".svelte-kit")
 
   # if not inside git, check global gitignore; if any pattern ends with /, consider it a dir to skip
   if (( ! inside_git )); then
@@ -853,3 +858,9 @@ esac
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+. "/Users/bartek/.deno/env"
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/bartek/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
