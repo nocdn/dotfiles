@@ -1,495 +1,409 @@
-# Add deno completions to search path
-if [[ ":$FPATH:" != *":/Users/bartek/.zsh/completions:"* ]]; then export FPATH="/Users/bartek/.zsh/completions:$FPATH"; fi
-# zsh Autosuggestions plugin manual installation
-source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+# ~/.zshrc
 
-
-# history options
+# -- History Settings --
+# Keep plenty of history
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
+# Remove duplicates
 HISTDUP=erase
-setopt appendhistory
-setopt sharehistory
-setopt hist_ignore_all_dups
-setopt hist_ignore_dups
-setopt hist_find_no_dups
+# Standard history options
+setopt appendhistory sharehistory hist_ignore_all_dups hist_ignore_dups hist_find_no_dups
 
-# completion styling to help with zeoxide
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-zstyle ':completion:*' menu no
-
-
-# node and npm initialization
+# -- Environment Variables & Path --
+# Homebrew (Apple Silicon path) - This eval can take time, but often necessary
+# Ensure it runs only once if possible
 eval "$(/opt/homebrew/bin/brew shellenv)"
-export PATH=/opt/homebrew/bin:$PATH
-export PATH="/usr/local/bin:$PATH"
-export PATH=~/.npm-global/bin:$PATH
-export PATH="/Users/bartek/.local/bin:$PATH"
-export NVM_DIR="$HOME/.nvm"
 
-alias docker="/Applications/Docker.app/Contents/Resources/bin/docker"
+# Add other paths (consolidated)
+# No need to add /opt/homebrew/bin again, brew shellenv does it
+export PATH="/usr/local/bin:$PATH" # Standard macOS path
+export PATH="$HOME/.npm-global/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH" # Cargo path
+export PATH="$HOME/.bun/bin:$PATH" # Bun path
+export PATH="$HOME/.deno/bin:$PATH" # Deno path
+export PATH="$HOME/Library/pnpm:$PATH" # PNPM path
 
+# Environment variables
+export NVM_DIR="$HOME/.nvm" # Set NVM_DIR path for lazy loading function
+export EDITOR=/opt/homebrew/bin/nvim
 export MINIO_CONFIG_ENV_FILE=/etc/default/minio
+export EXA_COLORS="di=38;5;117:ex=38;5;177:no=00:da=0;0:sn=0;0" # eza colors
 
-# from https://peterlyons.com/problog/2018/01/zsh-lazy-loading/
-# placeholder nvm shell function
-# On first use, it will set nvm up properly which will replace the `nvm`
-# shell function with the real one
+# -- Aliases --
+# General
+alias ls="eza"
+alias la="eza -l --no-permissions --no-user --no-filesize --sort=date"
+alias laa="eza -la --no-permissions --no-user --sort=date"
+alias zshconfig="code ~/.zshrc"
+alias reload="source ~/.zshrc"
+alias cl='clear'
+alias cp='cp -iv'
+alias mv='mv -iv'
+alias hist="cat ~/.zsh_history | fzf | pbcopy" # Use correct histfile path
+alias fcat="fzf | xargs cat"
+alias nq='networkQuality'
+alias ipinfo='curl -s http://ip-api.com/json/ | jq "."'
+alias py='python3'
+alias docker="/Applications/Docker.app/Contents/Resources/bin/docker" # Specific Docker path
+
+# Git
+alias gs='git status'
+alias ga='git add .' # Common usage: add all changes in pwd
+alias gp='git push'
+alias gc='git commit'
+
+# Development
+alias brd='bun run dev'
+alias brb='bun run build'
+
+# -- Functions --
+# (Your existing functions go here - function definitions are cheap at startup)
+# nvm lazy loader (corrected path check for Apple Silicon Homebrew)
 nvm() {
-  if [[ -d '/usr/local/opt/nvm' ]]; then
-    NVM_DIR="/usr/local/opt/nvm"
-    export NVM_DIR
-    # shellcheck disable=SC1090
-    source "${NVM_DIR}/nvm.sh"
-    if [[ -e ~/.nvm/alias/default ]]; then
-      PATH="${PATH}:${HOME}.nvm/versions/node/$(cat ~/.nvm/alias/default)/bin"
+  # check if nvm installed via homebrew on apple silicon
+  if [[ -d '/opt/homebrew/opt/nvm' ]]; then
+    export NVM_DIR="/opt/homebrew/opt/nvm" # set correct NVM_DIR
+    # shellcheck disable=SC1091 # source nvm script
+    \. "${NVM_DIR}/nvm.sh"
+    # add node path if default exists
+    if [[ -e "$HOME/.nvm/alias/default" ]]; then
+      export PATH="$PATH:$HOME/.nvm/versions/node/$(cat "$HOME/.nvm/alias/default")/bin"
     fi
     # invoke the real nvm function now
     nvm "$@"
+  # check if nvm installed manually or via installer
+  elif [[ -s "$HOME/.nvm/nvm.sh" ]]; then
+    export NVM_DIR="$HOME/.nvm"
+    # shellcheck disable=SC1091 # source nvm script
+    \. "$NVM_DIR/nvm.sh"
+    # invoke the real nvm function now
+    nvm "$@"
   else
-    echo "nvm is not installed" >&2
+    echo "nvm is not installed or NVM_DIR is not set correctly" >&2
     return 1
   fi
 }
 
-
-
-# personal aliases
-alias act='source bin/activate'
-alias nq='networkQuality'
-alias zshconfig="code ~/.zshrc"
-alias reload="source ~/.zshrc"
-alias hist="cat .zsh_history | fzf | pbcopy"
-
-alias fcat="fzf | xargs cat"
-alias ls="eza"
-alias la="eza -l --no-permissions --no-user --no-filesize --sort=date"
-alias laa="eza -la --no-permissions --no-user --sort=date"
-
-alias gs='git status'
-alias ga='git add'
-alias gp='git push'
-alias gc='git commit'
-alias cp='cp -iv'
-alias mv='mv -iv'
-alias cl='clear'
-alias ipinfo='curl -s http://ip-api.com/json/ | jq "."'
-alias brd='bun run dev'
-alias brb='bun run build'
-alias py='python3'
-
-export EDITOR=/opt/homebrew/bin/nvim
-
-autoload -z edit-command-line
-zle -N edit-command-line
-bindkey "^X^E" edit-command-line
-
-# dir color meanings
-# da = date and time
-# di = directory
-# ex = executable
-# fi = file
-# sn = size
-
-
-# export EZA_COLORS="di=34:ex=32:fi=0:sn=0:da=32"
-# export EXA_COLORS="di=0;35:da=0;0:sn=0;0"
-
-# export EXA_COLORS="da=0;0:sn=0;0"
-export EXA_COLORS="di=38;5;117:ex=38;5;177:no=00:da=0;0:sn=0;0"
-
-
-
-# Bind keys for history search (eg. only show matches from the current line)
-autoload -Uz compinit && compinit
-bindkey "^[[A" history-search-backward
-bindkey "^[[B" history-search-forward
-
-# Prompt customization
-# dark theme
-# PS1="%F{white}%n@%m %F{#F38BA8}%~ %F{white}%# %F"
-# light theme
-# PS1="%F{black}%n@%m %F{#B75D74}%~ %F{black}%# %F"
-# universal (auto adapts to background color of terminal)
-# ↓ includes hostname
-# PS1="%F{reset}%n@%m %F{#B75D74}%~ %F{reset}%# %F"
-PS1="%F{reset}%n %F{blue}%~ %F{reset}%# %F"
-
-# personal functions
+# listinstances
 function listinstances() {
     gcloud compute instances list --format="table[no-heading](name, networkInterfaces[0].accessConfigs[0].natIP:label=EXTERNAL_IP)"
 }
 
+# sshinstance
 function sshinstance() {
+    local external_ip
     if [ -z "$1" ]; then
-        read -r "external_ip?Enter the external IP of the instance you want to connect to: "
+        read -r "external_ip?Enter the external IP of the instance: "
     else
         external_ip="$1"
     fi
-
-    ssh_key="~/latest-server-ssh-key"
-
+    local ssh_key="$HOME/latest-server-ssh-key" # Use $HOME instead of ~
     ssh -i "$ssh_key" nk3h8wbq@"$external_ip" -o StrictHostKeyChecking=no
 }
 
-
-
+# tempinstance
 function tempinstance() {
-    # Define an array of instance types
-    local instance_types=(
-        "t2d-standard-1"
-        "t2d-standard-2"
-        "t2d-standard-4"
-        "t2d-standard-8"
-    )
+    local instance_types=("t2d-standard-1" "t2d-standard-2" "t2d-standard-4" "t2d-standard-8")
+    local selected_type=$(printf "%s\n" "${instance_types[@]}" | fzf --height=6 --prompt="Select instance type: ")
+    [[ -z "$selected_type" ]] && echo "No type selected." && return 1
+    echo "Selected type: $selected_type"
 
-    # Use fzf to select instance type
-    local selected_type=$(printf "%s\n" "${instance_types[@]}" | fzf --height=6 --prompt="Select an instance type: ")
-
-    if [[ -z "$selected_type" ]]; then
-        echo "No instance type selected. Exiting."
-        return 1
-    fi
-
-    echo "You selected: $selected_type"
-
-    # Use fzf to select disk type with correct options
     local disk_type=$(echo -e "pd-balanced\npd-standard\npd-ssd" | fzf --height=5 --prompt="Select disk type: ")
+    [[ -z "$disk_type" ]] && echo "No disk type selected." && return 1
+    echo "Selected disk type: $disk_type"
 
-    if [[ -z "$disk_type" ]]; then
-        echo "No disk type selected. Exiting."
-        return 1
-    fi
-
-    echo "You selected disk type: $disk_type"
-
-    # Prompt for custom disk size
-    echo -n "Enter disk size in GB (default is 10GB): "
-    read disk_size
+    local disk_size
+    read -r "disk_size?Enter disk size in GB (default 10): "
     disk_size=${disk_size:-10}
+    echo "Disk size: ${disk_size}GB"
 
-    echo "Disk size set to: ${disk_size}GB"
+    local instance_name
+    read -r "instance_name?Enter instance name (default testing-instance): "
+    instance_name=${instance_name:-testing-instance}
 
-    echo -n "Enter a name for the instance: "
-    read instance_name
-    if [[ -z "$instance_name" ]]; then
-        instance_name="testing-instance"
+    local ssh_key_file="$HOME/latest-server-ssh-key.pub" # Use $HOME
+    if [[ ! -f "$ssh_key_file" ]]; then
+        echo "SSH key file $ssh_key_file not found." && return 1
     fi
+    local ssh_key=$(<"$ssh_key_file")
 
-    # Define the path to the SSH key file
-    local ssh_key_file=~/latest-server-ssh-key.pub
-
-    # Read the SSH key from the file
-    if [[ -f $ssh_key_file ]]; then
-        local ssh_key
-        ssh_key=$(<"$ssh_key_file")
-    else
-        echo "SSH key file $ssh_key_file not found."
-        return 1
-    fi
-
-    # Run the gcloud command with the selected instance type, disk type, and size
-    gcloud compute instances create $instance_name \
+    gcloud compute instances create "$instance_name" \
         --zone=europe-west2-a \
-        --machine-type=$selected_type \
-        --boot-disk-type=$disk_type \
-        --boot-disk-size=${disk_size}GB \
+        --machine-type="$selected_type" \
+        --boot-disk-type="$disk_type" \
+        --boot-disk-size="${disk_size}GB" \
         --preemptible \
         --tags=testing,minecraft,http-server,https-server \
         --scopes=https://www.googleapis.com/auth/cloud-platform \
-        --metadata ssh-keys="nk3h8wbq:$ssh_key"
+        --metadata ssh-keys="nk3h8wbq:$ssh_key" || return 1 # Exit if create fails
 
-    gcloud compute ssh testing-instance --zone=europe-west2-a
-
-    echo "gcloud compute ssh testing-instance --zone=europe-west2-a" | pbcopy
+    echo "Attempting to SSH into $instance_name..."
+    gcloud compute ssh "$instance_name" --zone=europe-west2-a
+    # Copy SSH command to clipboard after successful creation/connection attempt
+    echo "gcloud compute ssh $instance_name --zone=europe-west2-a" | pbcopy
 }
 
+# stopinstances
 function stopinstances {
     local instance_name="$1"
-
-    # Get the list of running instances
     local instances=$(gcloud compute instances list --filter="status=RUNNING" --format="table[no-heading](name, zone)")
-    # Check if any instances are running
-    if [[ -z "$instances" ]]; then
-        echo "No running instances found."
-        return
-    fi
-    # Convert the instances list to an array
+    [[ -z "$instances" ]] && echo "No running instances found." && return 0
     local instance_array=("${(@f)instances}")
+    local selected_instance_name selected_instance_zone
 
     if [[ -n "$instance_name" ]]; then
-        # Check if the provided instance name exists in the list
         local found=false
         for instance in "${instance_array[@]}"; do
             if [[ "${instance%% *}" == "$instance_name" ]]; then
-                local selected_instance_name="$instance_name"
-                local selected_instance_zone="${instance##* }"
+                selected_instance_name="$instance_name"
+                selected_instance_zone="${instance##* }"
                 found=true
                 break
             fi
         done
-        if ! $found; then
-            echo "Instance '$instance_name' not found or not running."
-            return
-        fi
+        if ! $found; then echo "Instance '$instance_name' not found or not running." && return 1; fi
     else
-        # Display the list of running instances
-        echo "Please select an instance to stop:"
-        for ((i = 1; i <= ${#instance_array[@]}; i++)); do
-            echo "$i. ${instance_array[$i]%% *}"
+        echo "Select an instance to stop:"
+        select instance_choice in "${instance_array[@]}" "Cancel"; do
+            if [[ "$instance_choice" == "Cancel" || -z "$instance_choice" ]]; then
+                 echo "Operation cancelled." && return 0
+            fi
+            selected_instance_name="${instance_choice%% *}"
+            selected_instance_zone="${instance_choice##* }"
+            break
         done
-        # Read user input
-        read -r "selection?Enter the number corresponding to the instance you want to stop: "
-        if [[ $selection -gt 0 && $selection -le ${#instance_array[@]} ]]; then
-            # Get the selected instance details
-            local selected_instance="${instance_array[$((selection))]}"
-            local selected_instance_name="${selected_instance%% *}"
-            local selected_instance_zone="${selected_instance##* }"
-        else
-            echo "Invalid selection. Please try again."
-            return
-        fi
     fi
 
     echo "Stopping instance: $selected_instance_name in zone: $selected_instance_zone"
-    # Run the gcloud command to stop the selected instance
     gcloud compute instances stop "$selected_instance_name" --zone="$selected_instance_zone"
 }
 
+# startinstances
 function startinstances {
     local instance_name="$1"
-
-    # get list of terminated instances
     local instances=$(gcloud compute instances list --filter="status=TERMINATED" --format="table[no-heading](name, zone)")
-    # check if any instances are terminated
-    if [[ -z "$instances" ]]; then
-        echo "No terminated instances found."
-        return
-    fi
-    # convert instances list to an array
+    [[ -z "$instances" ]] && echo "No terminated instances found." && return 0
     local instance_array=("${(@f)instances}")
+    local selected_instance_name selected_instance_zone
 
     if [[ -n "$instance_name" ]]; then
-        # check if provided instance name exists in the list
         local found=false
         for instance in "${instance_array[@]}"; do
             if [[ "${instance%% *}" == "$instance_name" ]]; then
-                local selected_instance_name="$instance_name"
-                local selected_instance_zone="${instance##* }"
+                selected_instance_name="$instance_name"
+                selected_instance_zone="${instance##* }"
                 found=true
                 break
             fi
         done
-        if ! $found; then
-            echo "Instance '$instance_name' not found or not terminated."
-            return
-        fi
+        if ! $found; then echo "Instance '$instance_name' not found or not terminated." && return 1; fi
     else
-        # display list of terminated instances
-        echo "Please select an instance to start:"
-        for ((i = 1; i <= ${#instance_array[@]}; i++)); do
-            echo "$i. ${instance_array[$i]%% *}"
+        echo "Select an instance to start:"
+         select instance_choice in "${instance_array[@]}" "Cancel"; do
+            if [[ "$instance_choice" == "Cancel" || -z "$instance_choice" ]]; then
+                 echo "Operation cancelled." && return 0
+            fi
+            selected_instance_name="${instance_choice%% *}"
+            selected_instance_zone="${instance_choice##* }"
+            break
         done
-        # read user input
-        read -r "selection?Enter the number corresponding to the instance you want to start: "
-        if [[ $selection -gt 0 && $selection -le ${#instance_array[@]} ]]; then
-            # Get the selected instance details
-            local selected_instance="${instance_array[$((selection))]}"
-            local selected_instance_name="${selected_instance%% *}"
-            local selected_instance_zone="${selected_instance##* }"
-        else
-            echo "Invalid selection. Please try again."
-            return
-        fi
     fi
 
     echo "Starting instance: $selected_instance_name in zone: $selected_instance_zone"
-    # run gcloud command to start the selected instance
-    gcloud compute instances start "$selected_instance_name" --zone="$selected_instance_zone"
+    gcloud compute instances start "$selected_instance_name" --zone="$selected_instance_zone" || return 1
 
-    # wait a bit for instance to fully start
     echo "Waiting for instance to initialize..."
-    sleep 10
+    sleep 10 # Consider a more robust check if needed
 
-    # get external IP address
-    local external_ip=$(gcloud compute instances describe "$selected_instance_name" --zone="$selected_instance_zone" --format="get(networkInterfaces[0].accessConfigs[0].natIP)")
+    local external_ip=$(gcloud compute instances describe "$selected_instance_name" --zone="$selected_instance_zone" --format="get(networkInterfaces[0].accessConfigs[0].natIP)" 2>/dev/null)
 
     if [[ -n "$external_ip" ]]; then
         echo "External IP: $external_ip"
         echo "Connecting to instance..."
         sshinstance "$external_ip"
     else
-        echo "Could not find external IP. Please check the instance status and try to connect manually."
+        echo "Could not find external IP. Instance might still be starting. Try connecting manually."
     fi
 }
 
+# deleteinstance
 function deleteinstance() {
-    instance_name=$1  # assign first positional parameter to instance_name
-
-    if [ -z "$instance_name" ]; then
-        echo "Error: No instance name provided."
-        echo "Usage: deleteinstance <instance_name>"
-        return 1
+    local instance_name=$1
+    if [[ -z "$instance_name" ]]; then
+        echo "Usage: deleteinstance <instance_name>" && return 1
     fi
-
+    # Add a confirmation prompt
+    read -r "confirm?Really delete instance '$instance_name'? [y/N]: "
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        echo "Deletion cancelled." && return 0
+    fi
     gcloud compute instances delete "$instance_name"
 }
 
-
+# convert_to_iso8601_llm
 function convert_to_iso8601_llm() {
   local input_date="$1"
-  # Get the current date in iso8601 format
-  local current_date=$(date -I) # This gets the current date in YYYY-MM-DD format
-
+  local current_date=$(date -I) # yyyy-mm-dd
+  # Check if OPENAI_API_KEY is set
+  if [[ -z "$OPENAI_API_KEY" ]]; then
+    echo "Error: OPENAI_API_KEY environment variable is not set." >&2
+    return 1
+  fi
   curl -s https://api.openai.com/v1/chat/completions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $OPENAI_API_KEY" \
     -d "{
       \"model\": \"gpt-4o-2024-08-06\",
       \"messages\": [
-        {
-          \"role\": \"system\",
-          \"content\": \"You convert dates given in natural language into iso8601 format. Output just the date in iso8601 format. Make sure to use the year 2024. The current date is $current_date.\"
-        },
-        {
-          \"role\": \"user\",
-          \"content\": \"$input_date\"
-        }
-      ]
+        {\"role\": \"system\", \"content\": \"You convert dates given in natural language into iso8601 format (YYYY-MM-DD). Output ONLY the date string. Use the current year 2024 unless specified otherwise. The current date is $current_date.\"},
+        {\"role\": \"user\", \"content\": \"$input_date\"}
+      ],
+      \"temperature\": 0.1
     }" | jq -r '.choices[0].message.content'
 }
 
-
+# gcp (git commit push helper)
 function gcp() {
-    local date=""
-    local time=""
-    local help=false
-
-    # parse command line arguments
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            -d|--date)
-                date="$2"
-                shift 2
-                ;;
-            -t|--time)
-                time="$2"
-                shift 2
-                ;;
-            --help)
-                help=true
-                shift
-                ;;
-            *)
-                break
-                ;;
+    local date="" time="" help=false
+    # Use getopts for robust argument parsing
+    while getopts ":d:t:h-" opt; do
+        case $opt in
+            d) date="$OPTARG" ;;
+            t) time="$OPTARG" ;;
+            h|-) help=true ;; # Handle --help
+            \?) echo "Invalid option: -$OPTARG" >&2; return 1 ;;
+            :) echo "Option -$OPTARG requires an argument." >&2; return 1 ;;
         esac
     done
+    shift $((OPTIND - 1)) # Remove parsed options
 
-    # check for help flag
-    if [[ "$help" == true ]]; then
+    if [[ "$help" = true ]]; then
+        # (Help text remains the same)
         echo -e "\nUsage: gcp [-d|--date <date>] [-t|--time <hh:mm>] [--help]"
-        echo
-        echo "Description:"
-        echo "  Stages all changes, commits with a message, and pushes to the remote repository."
-        echo "  Optionally allows setting a custom date and time for the commit."
-        echo
-        echo "Options:"
-        echo "  -d, --date <date>       Set a custom date for the commit (e.g., 'August 5th', '5th August', '05-08-2024')"
-        echo "  -t, --time <hh:mm>      Set a custom time for the commit"
-        echo "  --help                  Display this help message"
-        echo
-        echo "Details:"
-        echo "  - If no date is provided, the current date is used"
-        echo "  - If no time is provided, the current time is used"
-        echo "  - Date format: 'Month Day', 'Day Month', or 'dd-mm-yyyy' (e.g., 'August 5th', '5th August', '05-08-2024')"
-        echo "  - Time format: hh:mm (e.g., 14:30)"
-        echo "  - The commit message is prompted interactively\n"
+        echo "  Stages all changes, commits with a prompted message, and pushes."
+        echo "  Options allow overriding the commit date/time.\n"
         return 0
+    fi
+
+    # Check for unparsed arguments (like a commit message mistakenly put here)
+    if [[ $# -gt 0 ]]; then
+        echo "Error: Unexpected arguments: $@" >&2
+        echo "Usage: gcp [-d date] [-t time]" >&2
+        return 1
     fi
 
     git add .
 
-    echo -n "Commit message: "
-    read commit_message
+    local commit_message
+    read -r "commit_message?Commit message: "
+    if [[ -z "$commit_message" ]]; then
+        echo "Commit message cannot be empty. Aborting." >&2
+        return 1
+    fi
 
-    # prepare date string
+    local date_string=""
     if [[ -n "$date" || -n "$time" ]]; then
+        local iso_date time_part
         if [[ -n "$date" ]]; then
-            # Convert the provided date using the convert_to_iso8601 function
             iso_date=$(convert_to_iso8601_llm "$date")
-            if [[ $? -ne 0 ]]; then
-                echo "Error: Unable to parse the date '$date'."
+            if [[ $? -ne 0 || -z "$iso_date" ]]; then
+                echo "Error converting date '$date'. Aborting." >&2
                 return 1
             fi
         else
             iso_date=$(date +"%Y-%m-%d")
         fi
 
-        if [[ -z "$time" ]]; then
-            time=$(date +"%H:%M")
-        fi
+        time_part=${time:-$(date +"%H:%M")}
 
-        # combine date and time to ISO 8601 format
-        date_string=$(date -j -f "%Y-%m-%d %H:%M" "${iso_date} ${time}" +"%Y-%m-%dT%H:%M:%S")
-        echo "Setting GIT_AUTHOR_DATE and GIT_COMMITTER_DATE to: $date_string"
+        # Attempt to format the date using 'date' command
+        date_string=$(date -j -f "%Y-%m-%d %H:%M" "${iso_date} ${time_part}" +"%Y-%m-%dT%H:%M:%S%z" 2>/dev/null)
+        if [[ $? -ne 0 ]]; then
+            echo "Error formatting date/time: ${iso_date} ${time_part}. Using current time." >&2
+            date_string="" # Fallback to no date override
+        else
+             echo "Using custom commit date: $date_string"
+        fi
+    fi
+
+    if [[ -n "$date_string" ]]; then
         GIT_AUTHOR_DATE="$date_string" GIT_COMMITTER_DATE="$date_string" git commit -m "$commit_message"
     else
         git commit -m "$commit_message"
     fi
 
-    # push changes
-    git push
+    # check commit success before pushing
+    if [[ $? -eq 0 ]]; then
+      echo "Pushing changes..."
+      git push
+    else
+      echo "Commit failed. Aborting push." >&2
+      return 1
+    fi
 }
 
+# cmprss (audio compression)
 function cmprss() {
-    # check if input file is provided
-    if [[ $# -eq 0 ]]; then
-        echo "usage: compress_audio <input_file>"
-        return 1
-    fi
+    [[ $# -eq 0 ]] && echo "Usage: cmprss <input_file>" && return 1
+    local input_file="$1"
+    [[ ! -f "$input_file" ]] && echo "Error: Input file not found." && return 1
+    local input_ext="${input_file##*.}"
 
-    input_file="$1"
-    input_ext="${input_file##*.}"
+    local bitrate sample_rate format speed_multiplier
+    read -r "bitrate?Bitrate (default: 16k): "
+    read -r "sample_rate?Sample rate (default: 16000): "
+    read -r "format?Output format (default: opus): "
+    read -r "speed_multiplier?Speed multiplier (default: 1): "
 
-    # ask for parameters
-    read "bitrate?enter bitrate (default: 16k): "
-    read "sample_rate?enter sample rate (default: 16000): "
-    read "format?enter output format (default: opus): "
-    read "speed_multiplier?enter speed multiplier (default: 1): "
-
-    # set defaults if empty
     bitrate=${bitrate:-16k}
     sample_rate=${sample_rate:-16000}
     format=${format:-opus}
     speed_multiplier=${speed_multiplier:-1}
 
-    # get input filename without extension
-    filename=$(basename "$input_file" | sed 's/\.[^.]*$//')
-
-    # construct output filename - add (compressed) if format is same as input extension
-    if [[ "$format" == "$input_ext" ]]; then
-        output_file="${filename}(compressed).${format}"
+    local filename=$(basename "$input_file" ".$input_ext")
+    local output_file
+    # Add suffix only if format AND speed are unchanged (or speed=1)
+    if [[ "$format" == "$input_ext" && "$(echo "$speed_multiplier == 1" | bc -l)" -eq 1 ]]; then
+         output_file="${filename}(compressed).${format}"
     else
-        output_file="${filename}.${format}"
+         output_file="${filename}.${format}" # Format change implies difference
     fi
 
-    # run ffmpeg command with speed adjustment
-    if (( $(echo "$speed_multiplier == 1" | bc -l) )); then
-        ffmpeg -i "$input_file" -ac 1 -ar "$sample_rate" -b:a "$bitrate" "$output_file"
-    else
-        ffmpeg -i "$input_file" -filter:a "atempo=$speed_multiplier" -ac 1 -ar "$sample_rate" -b:a "$bitrate" "$output_file"
+    local ffmpeg_cmd=("ffmpeg" "-i" "$input_file")
+    # add speed filter if needed
+    if (( $(echo "$speed_multiplier != 1" | bc -l) )); then
+        ffmpeg_cmd+=("-filter:a" "atempo=$speed_multiplier")
     fi
+    # add audio codec options
+    ffmpeg_cmd+=("-ac" "1" "-ar" "$sample_rate" "-b:a" "$bitrate" "$output_file")
+
+    echo "Running: ${ffmpeg_cmd[*]}"
+    "${ffmpeg_cmd[@]}"
 }
 
+# duh (disk usage human-readable)
 function duh() {
-    local file_name="$1"
-    du -h "$file_name"
+    local target="." # Default to current directory
+    if [[ $# -gt 0 ]]; then
+        target="$1"
+    fi
+    # Check if target exists
+    if [[ ! -e "$target" ]]; then
+        echo "Error: '$target' not found." >&2
+        return 1
+    fi
+    # Use -d 1 for one level deep in directories, or just -h for files/single dir total
+    if [[ -d "$target" ]]; then
+         du -hd 1 "$target" | sort -h
+    else
+         du -h "$target"
+    fi
 }
 
+# rename (using Anthropic API)
 rename() {
-    # Function to process a single file
     process_file() {
         local fullFilePath="$1"
         local filename=$(basename "$fullFilePath")
@@ -497,370 +411,378 @@ rename() {
         local filenameWithoutExt="${filename%.*}"
         local dirPath=$(dirname "$fullFilePath")
 
-        # Escape the system prompt for JSON
-        local systemPrompt=$(jq -n --arg sp "Rename the given filename by the user, ensuring clarity and brevity. Retain essential elements like names, chapter numbers, episode codes, dates, etc., replacing underscores and dashes with spaces (unless it is times or dates, then keep the dates combined with dashes only, use DD-MM-YYYY). Capitalise first letters. Never capilatize the word 'and'. Remove non-informative text like 'version', 'final', 'edit', or repetitive information. Provide the new filename without the extension. Expand abbreviations like 'lang\" to language'. NEVER use quotes. For TV series use this format: [Film title with capitalized first letters of each word] [Episode code]. In TV series, remove the year from the filename, but keep it in brackets for films. Examples: 'thesis_final_edit_v2' becomes 'Thesis V2'; 'JohnDoe_Report_Version_23.10.2021' becomes 'John Doe Report 23-10-2021'; 'Barbie.2023.HC.1080p.WEB-DL.AAC2.0.H.264-APEX[TGx]' becomes 'Barbie (2023)'; 'What.If.2021.S02E08.WEB.x264-TORRENTGALAXY' becomes 'What If S02E08'." '$sp')
+        # Check if ANTHROPIC_API_KEY is set
+        if [[ -z "$ANTHROPIC_API_KEY" ]]; then
+          echo "Error: ANTHROPIC_API_KEY environment variable is not set." >&2
+          # Optionally try the hardcoded key as a fallback ONLY IF NEEDED
+          # local api_key="sk-ant-api03-..." # Avoid hardcoding keys if possible
+          # If still no key, return error
+          # if [[ -z "$api_key" ]]; then return 1; fi
+          # else
+           local api_key="$ANTHROPIC_API_KEY"
+          # fi
+        else
+           local api_key="$ANTHROPIC_API_KEY"
+        fi
+
+
+        # system prompt as variable
+        local systemPrompt="Rename the given filename by the user, ensuring clarity and brevity. Retain essential elements like names, chapter numbers, episode codes, dates, etc., replacing underscores and dashes with spaces (unless it is times or dates, then keep the dates combined with dashes only, use DD-MM-YYYY format). Capitalize first letters of significant words. Never capitalize the word 'and'. Remove non-informative text like 'version', 'final', 'edit', or repetitive information. Provide ONLY the new filename without the extension. Expand common abbreviations (e.g., 'lang' to 'language'). NEVER use quotes in the output. For TV series use format: [Show Title Capitalized] [Episode Code]. Remove the year from TV series filenames. For films, use format: [Film Title Capitalized] ([Year]). Examples: 'thesis_final_edit_v2' -> 'Thesis V2'; 'JohnDoe_Report_Version_23.10.2021' -> 'John Doe Report 23-10-2021'; 'Barbie.2023.HC.1080p.WEB-DL.AAC2.0.H.264-APEX[TGx]' -> 'Barbie (2023)'; 'What.If.2021.S02E08.WEB.x264-TORRENTGALAXY' -> 'What If S02E08'."
+
+        # construct json payload using jq for safety
+        local json_payload
+        json_payload=$(jq -n \
+          --arg model "claude-3-5-sonnet-20240620" \
+          --arg system "$systemPrompt" \
+          --arg user_content "$filenameWithoutExt" \
+          '{ model: $model, max_tokens: 100, system: $system, messages: [ {role: "user", content: $user_content} ] }'
+        )
 
         local response=$(curl -s https://api.anthropic.com/v1/messages \
           -H "Content-Type: application/json" \
-          -H "x-api-key: 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" \
+          -H "x-api-key: $api_key" \
           -H "anthropic-version: 2023-06-01" \
-          -d "$(jq -n \
-            --arg model "claude-3-5-sonnet-20240620" \
-            --arg system "$systemPrompt" \
-            --arg user_content "$filenameWithoutExt" \
-            '{
-              model: $model,
-              max_tokens: 1024,
-              system: $system,
-              messages: [
-                {role: "user", content: $user_content}
-              ]
-            }'
-          )")
+          -d "$json_payload")
 
-        # Extract the new filename from the response
-        local newFilename=$(echo "$response" | jq -r '.content[0].text')
+        local newFilename=$(echo "$response" | jq -r '.content[0].text // empty')
 
-        # Ensure newFilename is not empty
         if [[ -z "$newFilename" ]]; then
-            echo "Error: Failed to generate new filename for $filename"
+            echo "Error: Failed to generate new filename for '$filename'. API Response:" >&2
+            echo "$response" >&2 # Print response for debugging
             return 1
         fi
 
-        # Construct the new full file path
+        # Sanitize newFilename: remove leading/trailing whitespace, replace / with _
+        newFilename=$(echo "$newFilename" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s/\//_/g')
+
+        # check again if empty after sanitizing
+         if [[ -z "$newFilename" ]]; then
+            echo "Error: Generated filename is empty or invalid for '$filename'." >&2
+            return 1
+        fi
+
+
         local newFullFilePath="$dirPath/$newFilename.$extension"
 
-        # Rename the file
-        if mv "$fullFilePath" "$newFullFilePath"; then
-            echo "File successfully renamed to: $newFilename.$extension"
+        # Avoid renaming if new name is same as old
+        if [[ "$fullFilePath" == "$newFullFilePath" ]]; then
+             echo "Skipping rename for '$filename', name is unchanged."
+             return 0
+        fi
+
+        # Check if target file already exists
+        if [[ -e "$newFullFilePath" ]]; then
+             echo "Error: Target file '$newFilename.$extension' already exists. Skipping rename for '$filename'." >&2
+             return 1
+        fi
+
+        if mv -n "$fullFilePath" "$newFullFilePath"; then # Use -n to prevent overwrite (belt-and-suspenders)
+            echo "'$filename' -> '$newFilename.$extension'"
         else
-            echo "Error: Failed to rename the file $filename"
+            echo "Error: Failed to rename '$filename' to '$newFilename.$extension'" >&2
             return 1
         fi
     }
 
-    # Main function logic
     if [[ $# -eq 0 ]]; then
-        echo "Usage: rename <file1> [file2] [file3] ..."
-        return 1
+        echo "Usage: rename <file1> [file2] ..." && return 1
     fi
 
-    # Loop through all provided files
     for file in "$@"; do
         if [[ -f "$file" ]]; then
             process_file "$file"
+        elif [[ -e "$file" ]]; then
+             echo "Skipping: '$file' is not a regular file." >&2
         else
-            echo "Error: File not found - $file"
+            echo "Error: File not found - '$file'" >&2
         fi
     done
 }
 
+# github_repo_init
 github_repo_init() {
-    # Check if a repository name was provided
-    if [ -z "$1" ]; then
-        echo "Please provide a repository name."
+    [[ -z "$1" ]] && echo "Usage: github_repo_init <repo_name>" && return 1
+    local repo_name=$1
+
+    # check if gh cli is installed
+    if ! command -v gh &> /dev/null; then
+        echo "Error: GitHub CLI 'gh' not found. Please install it." >&2
         return 1
     fi
 
-    local repo_name=$1
+    # check if directory already exists
+    if [[ -e "$repo_name" ]]; then
+       echo "Error: Directory '$repo_name' already exists." >&2
+       return 1
+    fi
 
-    # Create the directory and navigate into it
-    mkdir $repo_name && cd $repo_name
+    mkdir "$repo_name" && cd "$repo_name" || return 1 # exit if mkdir/cd fails
 
-    # Initialize the local git repository
-    git init
-
-    # Create an initial file
+    git init -b main # initialize with main branch
     echo "# $repo_name" > README.md
-
-    # Add and commit the README file
     git add README.md
     git commit -m "Initial commit"
 
-    # Rename the branch to 'main'
-    git branch -M main
-
-    # Create a new repository on GitHub
-    gh repo create $repo_name --public --source=. --remote=origin
-
-    # Push the changes to GitHub
-    git push -u origin main
-
-    echo "Repository $repo_name has been created and pushed to GitHub."
+    echo "Creating GitHub repository '$repo_name'..."
+    if gh repo create "$repo_name" --public --source=. --remote=origin; then
+        echo "Pushing initial commit to origin/main..."
+        if git push -u origin main; then
+            echo "Repository '$repo_name' created and pushed successfully."
+        else
+            echo "Error: Failed to push to GitHub." >&2
+            # you are already in the dir, so maybe cd .. is not needed here
+            # cd .. # Clean up by going back up? Or stay in repo? Staying is probably better.
+            return 1
+        fi
+    else
+        echo "Error: Failed to create GitHub repository." >&2
+        # Clean up the local directory if GitHub creation failed? Optional.
+        # echo "Cleaning up local directory '$repo_name'..."
+        # cd .. && rm -rf "$repo_name"
+        return 1
+    fi
 }
 
+# sox_audio
 function sox_audio() {
-    # Check if a file argument is provided
-    if [ -z "$1" ]; then
-        echo "Usage: convert_audio <filename>"
+    [[ -z "$1" ]] && echo "Usage: sox_audio <filename>" && return 1
+    local input_file="$1"
+    [[ ! -f "$input_file" ]] && echo "Error: Input file not found." && return 1
+
+    # check if sox is installed
+    if ! command -v sox &> /dev/null; then
+        echo "Error: 'sox' command not found. Please install it (brew install sox)." >&2
         return 1
     fi
 
-    # Get the input file name
-    input_file="$1"
+    local base_name="${input_file%.*}"
+    local extension="${input_file##*.}"
+    local output_file="${base_name}(sox).${extension}"
 
-    # Extract the base name and extension of the file
-    base_name="${input_file%.*}"
-    extension="${input_file##*.}"
-
-    # Create the output file name with (sox) appended
-    output_file="${base_name}(sox).${extension}"
-
-    # Use sox to perform the audio conversion
+    echo "Applying effects to '$input_file' -> '$output_file'"
     sox "$input_file" "$output_file" vol 0.8 bass +2 reverb 50 50 100 100 0.5 2
-
-    echo "Conversion completed: $output_file"
+    if [[ $? -eq 0 ]]; then
+        echo "Conversion completed: $output_file"
+    else
+        echo "Error during sox processing." >&2
+        return 1
+    fi
 }
 
-# Function to upload a file to https://0x0.st, output the download link, and copy it to clipboard
+# upload file to 0x0.st
 upload() {
-  # Check if a file path is provided
-  if [[ -z "$1" ]]; then
-    echo "Usage: upload_file <file>"
-    return 1
-  fi
-
-  # Extract the filename from the path
+  [[ -z "$1" ]] && echo "Usage: upload <file>" && return 1
   local file_path="$1"
+  [[ ! -f "$file_path" ]] && echo "Error: File not found: $file_path" && return 1
   local filename=$(basename "$file_path")
 
-  # Check if the file exists
-  if [[ ! -f "$file_path" ]]; then
-    return 1
-  fi
+  echo "Uploading '$filename'..."
+  # Use --fail to make curl exit with error on server error
+  local response=$(curl --progress-bar --fail -F "file=@${file_path}" https://0x0.st)
+  local curl_exit_code=$?
 
-  # Upload the file and capture the returned URL
-  local response=$(curl --progress-bar -F "file=@${file_path}" https://0x0.st)
-
-  # Check if upload was successful
-  if [[ $response == *"https://0x0.st/"* ]]; then
-    # Append the original filename to make the link accessible with the same name
-    local download_link="${response}/${filename}"
-
-    # Output the link
-    echo "$download_link"
-
-    # Copy the link to clipboard
-    if command -v pbcopy &>/dev/null; then
-      echo "$download_link" | pbcopy
-    elif command -v xclip &>/dev/null; then
-      echo "$download_link" | xclip -selection clipboard
-    fi
+  if [[ $curl_exit_code -eq 0 && $response == https://0x0.st/* ]]; then
+    # url encode filename for safety in url
+    local encoded_filename=$(printf %s "$filename" | jq -s -R -r @uri)
+    local download_link="${response}/${encoded_filename}" # use encoded name in link
+    echo "Link: $download_link"
+    # copy link to clipboard
+    echo "$download_link" | pbcopy
+    echo "Link copied to clipboard."
   else
+    echo "Error: File upload failed." >&2
+    echo "Curl exit code: $curl_exit_code" >&2
+    echo "Server response: $response" >&2
     return 1
   fi
 }
 
-combine_files () {
-  # usage: combine_files [-r] file_or_directory1 file_or_directory2 ...
-  local recursive=0
-  local targets=()
+# combine_files
+combine_files() {
+    local recursive=0
+    local targets=()
+    local OPTIND=1 # Reset OPTIND for getopts
+    while getopts "r" opt; do
+        case "$opt" in
+            r) recursive=1 ;;
+            \?) echo "Usage: combine_files [-r] file_or_directory..." >&2; return 1 ;;
+        esac
+    done
+    shift $((OPTIND - 1))
+    targets=("$@")
+    [[ ${#targets[@]} -eq 0 ]] && echo "Usage: combine_files [-r] file_or_directory..." >&2 && return 1
 
-  # parse options: -r means process directories recursively
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      -r)
-        recursive=1
-        shift
-        ;;
-      *)
-        targets+=("$1")
-        shift
-        ;;
-    esac
-  done
+    local tmp_output
+    tmp_output=$(mktemp) || { echo "Failed to create temp file" >&2; return 1; }
+    # Ensure temp file cleanup on exit/interrupt
+    trap 'rm -f "$tmp_output"' EXIT HUP INT QUIT TERM
 
-  # use a temporary file for output
-  local tmp_output
-  tmp_output=$(mktemp)
+    local inside_git=0
+    git rev-parse --is-inside-work-tree &>/dev/null && inside_git=1
 
-  # check once if we are inside a git repository
-  local inside_git=0
-  if git rev-parse --is-inside-work-tree &> /dev/null; then
-    inside_git=1
-  fi
+    # Default + common excludes. Add more if needed.
+    local exclude_dirs=(".git" "node_modules" "venv" "dist" "build" ".svelte-kit" "__pycache__" ".DS_Store" ".idea" ".vscode")
+    local global_patterns=()
 
-  # define default directory exclusions
-  local exclude_dirs=(".git" "node_modules" "venv" "dist" "build" ".svelte-kit")
-
-  # if not inside git, check global gitignore; if any pattern ends with /, consider it a dir to skip
-  if (( ! inside_git )); then
-    local global_ignore
-    global_ignore=$(git config --get core.excludesfile 2>/dev/null)
-    if [[ -n "$global_ignore" && -f "$global_ignore" ]]; then
-      while IFS= read -r pattern; do
-        # trim whitespace; skip empty lines and comments
-        pattern=$(echo "$pattern" | sed 's/^\s*//;s/\s*$//')
-        [[ -z "$pattern" || "$pattern" == \#* ]] && continue
-        # if pattern ends with / then treat it as a dir exclusion
-        if [[ "$pattern" == */ ]]; then
-          pattern="${pattern%/}"  # remove trailing slash
-          local found=0
-          for ed in "${exclude_dirs[@]}"; do
-            if [[ "$ed" == "$pattern" ]]; then
-              found=1
-              break
-            fi
-          done
-          if (( ! found )); then
-            exclude_dirs+=("$pattern")
-          fi
+    # Add patterns from global gitignore if not in a repo
+    if (( ! inside_git )); then
+        local global_ignore_file
+        global_ignore_file=$(git config --get core.excludesfile 2>/dev/null)
+        if [[ -n "$global_ignore_file" && -f "$global_ignore_file" ]]; then
+            # Read patterns, handle comments/empty lines, add dir patterns to exclude_dirs
+             while IFS= read -r pattern || [[ -n "$pattern" ]]; do # Process last line if no newline
+                pattern=$(echo "$pattern" | sed 's/^\s*//;s/\s*$//') # Trim whitespace
+                [[ -z "$pattern" || "$pattern" == \#* ]] && continue # Skip empty/comments
+                global_patterns+=("$pattern") # Add all patterns for later file checks
+                if [[ "$pattern" == */ ]]; then # If it's a directory pattern
+                    pattern="${pattern%/}" # Remove trailing /
+                    # Add to exclude_dirs if not already present
+                    local found=0; for ed in "${exclude_dirs[@]}"; do [[ "$ed" == "$pattern" ]] && found=1 && break; done; (( ! found )) && exclude_dirs+=("$pattern")
+                fi
+            done < "$global_ignore_file"
         fi
-      done < "$global_ignore"
-    fi
-  fi
-
-  # load global_patterns array (all patterns) from global gitignore for file-level checks;
-  # note: we already incorporated patterns ending with / into directory exclusions
-  local global_patterns=()
-  if (( ! inside_git )); then
-    local global_ignore
-    global_ignore=$(git config --get core.excludesfile 2>/dev/null)
-    if [[ -n "$global_ignore" && -f "$global_ignore" ]]; then
-      while IFS= read -r pattern; do
-        pattern=$(echo "$pattern" | sed 's/^\s*//;s/\s*$//')
-        [[ -z "$pattern" || "$pattern" == \#* ]] && continue
-        global_patterns+=("$pattern")
-      done < "$global_ignore"
-    fi
-  fi
-
-  # helper function: process an individual file and append its content to tmp_output
-  process_file() {
-    local file="$1"
-
-    # ensure file is a regular file
-    if [[ ! -f "$file" ]]; then
-      return
     fi
 
-    # extra check: skip if file path contains an excluded directory (safety net)
-    for ed in "${exclude_dirs[@]}"; do
-      if [[ "$file" == *"/$ed/"* ]]; then
-        return
-      fi
+    process_file() {
+        local file="$1"
+        # Basic checks
+        [[ ! -f "$file" ]] && return 0 # Skip non-files silently
+
+        # Mime type check (more robust than just 'text')
+        local mime
+        mime=$(file -b --mime-type "$file")
+        [[ $mime != text/* && $mime != application/json && $mime != application/xml && $mime != application/javascript && $mime != inode/x-empty ]] && return 0
+
+        # Directory exclusion check (including path components)
+        local component
+        for component in $(echo "$file" | tr '/' ' '); do
+            for ed in "${exclude_dirs[@]}"; do
+                [[ "$component" == "$ed" ]] && return 0
+            done
+        done
+
+        # Git ignore check
+        if (( inside_git )); then
+            git check-ignore -q "$file" && return 0
+        else
+            # Check against global non-dir patterns if not in git repo
+            for pattern in "${global_patterns[@]}"; do
+                [[ "$pattern" == */ ]] && continue # Skip dir patterns here
+                # Simple wildcard matching (can be improved with more complex gitignore logic if needed)
+                 if [[ "$file" == $pattern ]]; then # Basic globbing check
+                     return 0
+                 fi
+            done
+        fi
+
+        # Get absolute path
+        local abs_path
+         if command -v realpath &>/dev/null; then abs_path=$(realpath "$file")
+         elif command -v greadlink &>/dev/null; then abs_path=$(greadlink -f "$file") # gnu readlink on macos
+         else perl -MCwd -e 'print Cwd::abs_path(shift)' "$file"; fi # perl fallback
+
+        {
+            echo "--- START FILE: $abs_path ---"
+            cat "$file"
+            echo "--- END FILE: $abs_path ---"
+            echo "" # Add a blank line between files
+        } >> "$tmp_output"
+    }
+
+    for target in "${targets[@]}"; do
+        if [[ -d "$target" ]]; then
+            if (( recursive )); then
+                # Build find command with pruning for efficiency
+                local find_args=("$target")
+                # Add path pruning for each exclude_dir
+                if [[ ${#exclude_dirs[@]} -gt 0 ]]; then
+                    find_args+=( \( -name "${exclude_dirs[1]}" ) # Start with first exclude dir
+                    for (( i=1; i<${#exclude_dirs[@]}; i++ )); do
+                        find_args+=( -o -name "${exclude_dirs[i+1]}" )
+                    done
+                    find_args+=( -type d \) -prune -o ) # Prune if name matches, OR continue
+                fi
+                 find_args+=( -type f -print ) # Find files
+
+                # Use find -print0 and read -d '' for safer handling of filenames with spaces/newlines
+                while IFS= read -r -d $'\0' f; do
+                    process_file "$f"
+                done < <(find "${find_args[@]}" -print0)
+            else
+                 echo "Warning: '$target' is a directory, use -r to process recursively. Skipping." >&2
+            fi
+        elif [[ -f "$target" ]]; then
+            process_file "$target"
+        else
+            echo "Warning: '$target' not found or not a file/directory. Skipping." >&2
+        fi
     done
 
-    # ensure file is text-based (or empty) using file command
-    local mime
-    mime=$(file -b --mime "$file")
-    if [[ $mime != text/* && $mime != *empty* ]]; then
-      return
-    fi
-
-    # if inside a git repo, use git check-ignore
-    if (( inside_git )); then
-      if git check-ignore -q "$file"; then
-        return
-      fi
+    if [[ -s "$tmp_output" ]]; then # Check if file has content
+        pbcopy < "$tmp_output"
+        cat "$tmp_output"
+        echo -e "\n--- Combined content copied to clipboard. ---"
     else
-      # otherwise, check against any file pattern from global gitignore (skip those not for directories)
-      if [[ ${#global_patterns[@]} -gt 0 ]]; then
-        for pattern in "${global_patterns[@]}"; do
-          [[ "$pattern" == */ ]] && continue
-          if [[ "$file" == *"$pattern"* ]]; then
-            return
-          fi
-        done
-      fi
+         echo "No text files found or processed."
     fi
 
-    {
-      echo "------------------"
-      if command -v realpath > /dev/null; then
-        realpath "$file"
-      else
-        perl -MCwd -e 'print Cwd::abs_path(shift)' "$file"
-      fi
-      echo "------------------"
-      cat "$file"
-      echo ""
-    } >> "$tmp_output"
-  }
-
-  # process each target
-  if (( recursive )); then
-    for target in "${targets[@]}"; do
-      if [[ -d "$target" ]]; then
-        # build an array of find arguments with directory pruning
-        local find_args=()
-        find_args+=( "$target" )
-        find_args+=( \( -type d \( )
-        local first=1
-        for ed in "${exclude_dirs[@]}"; do
-          if (( first )); then
-            find_args+=( -name "$ed" )
-            first=0
-          else
-            find_args+=( -o -name "$ed" )
-          fi
-        done
-        find_args+=( \) -prune \) -o -type f -print )
-        # use find to list files without recursing into the excluded directories
-        find "${find_args[@]}" | while IFS= read -r f; do
-          process_file "$f"
-        done
-      elif [[ -f "$target" ]]; then
-        process_file "$target"
-      else
-        echo "warning: $target is not a valid file or directory, skipping." 1>&2
-      fi
-    done
-  else
-    # non-recursive; process only if target is a file
-    for target in "${targets[@]}"; do
-      if [[ -f "$target" ]]; then
-        process_file "$target"
-      else
-        echo "warning: $target is not a file, skipping." 1>&2
-      fi
-    done
-  fi
-
-  # copy combined output to clipboard (macOS pbcopy) and also display it
-  pbcopy < "$tmp_output"
-  cat "$tmp_output"
-  rm "$tmp_output"
+    # No need for explicit rm, trap handles it
 }
 
-source <(fzf --zsh)
 
-# zeoxide initialization and iterm2 integration
-eval "$(zoxide init --cmd cd zsh)"
+# -- Plugin & Completion Initialization --
+
+# zsh-autosuggestions (manual install)
+# Sourcing plugins always adds some startup time. This is generally fast though.
+ZSH_AUTOSUGGEST_MANUAL_INSTALL_DIR="$HOME/.zsh/zsh-autosuggestions"
+if [[ -f "$ZSH_AUTOSUGGEST_MANUAL_INSTALL_DIR/zsh-autosuggestions.zsh" ]]; then
+  source "$ZSH_AUTOSUGGEST_MANUAL_INSTALL_DIR/zsh-autosuggestions.zsh"
+fi
+
+# fzf keybindings and fuzzy completion
+# Running <(...) executes command, source loads output. Adds startup time.
+if command -v fzf &> /dev/null; then
+  source <(fzf --zsh)
+fi
+
+# zeoxide init
+# Uses eval $() which runs a command. Adds startup time.
+if command -v zoxide &> /dev/null; then
+  eval "$(zoxide init --cmd cd zsh)"
+fi
+
+# iTerm2 Shell Integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-source ~/.zsh_secrets
-
-
-. "$HOME/.cargo/env"
-
-# dark mode syntax highlighting
-# source ~/.zsh/catppuccin_frappe-zsh-syntax-highlighting.zsh
-# light mode syntax highlighting
-# source ~/.zsh/dracula-zsh-syntax-highlighting.sh
-# source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
 # bun completions
-[ -s "/Users/bartek/.bun/_bun" ] && source "/Users/bartek/.bun/_bun"
+# Check existence before sourcing
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+# Add completion paths to fpath (Function Path)
+# Ensure these directories exist and contain completion files
+# Group fpath modifications together before compinit
+fpath=($HOME/.zsh/completions $fpath) # Deno completions (manual add)
+fpath=($HOME/.docker/completions $fpath) # Docker completions
 
-# pnpm
-export PNPM_HOME="/Users/bartek/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
+# Completion styling
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # Case-insensitive matching
+zstyle ':completion:*' menu no # Disable completion menu for zeoxide? (as commented)
 
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
-. "/Users/bartek/.deno/env"
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/bartek/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
+# Keybindings
+# Edit command line in $EDITOR
+autoload -z edit-command-line && zle -N edit-command-line && bindkey "^X^E" edit-command-line
+
+# Initialize Completion System LAST
+# Only run compinit once, after all fpath modifications
+# Use caching (-C) to speed up subsequent loads
+# Check if cache needs update (e.g., if ~/.zshrc or completion files are newer)
+# Simple check: if zcompdump is older than zshrc or doesn't exist
+if [[ ! -f ~/.zcompdump || ~/.zshrc -nt ~/.zcompdump ]]; then
+  autoload -Uz compinit && compinit
+  echo "Completion cache rebuilt." # Optional message
+else
+  autoload -Uz compinit && compinit -C
+fi
+
+# Prompt (PS1)
+PS1="%F{reset}%n %F{blue}%~ %F{reset}%# %F"
