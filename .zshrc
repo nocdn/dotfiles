@@ -597,138 +597,183 @@ upload() {
   fi
 }
 
-# combine_files
-combine_files() {
-    local recursive=0
-    local targets=()
-    local OPTIND=1 # Reset OPTIND for getopts
-    while getopts "r" opt; do
-        case "$opt" in
-            r) recursive=1 ;;
-            \?) echo "Usage: combine_files [-r] file_or_directory..." >&2; return 1 ;;
-        esac
-    done
-    shift $((OPTIND - 1))
-    targets=("$@")
-    [[ ${#targets[@]} -eq 0 ]] && echo "Usage: combine_files [-r] file_or_directory..." >&2 && return 1
+# vite-react
+# Bootstrap a Vite + React (+ TailwindCSS) project using Bun.
+function vite-react() {
+  set -euo pipefail
 
-    local tmp_output
-    tmp_output=$(mktemp) || { echo "Failed to create temp file" >&2; return 1; }
-    # Ensure temp file cleanup on exit/interrupt
-    trap 'rm -f "$tmp_output"' EXIT HUP INT QUIT TERM
+  # 1. Parse CLI flags / arguments
+  local ts_flag=0
+  local open_code=0
+  local -a extra_modules=()
+  local app_name=""
 
-    local inside_git=0
-    git rev-parse --is-inside-work-tree &>/dev/null && inside_git=1
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h|--help)
+        cat << 'EOF'
+Usage: vite-react [options] <app-name>
 
-    # Default + common excludes. Add more if needed.
-    local exclude_dirs=(".git" "node_modules" "venv" "dist" "build" ".svelte-kit" "__pycache__" ".DS_Store" ".idea" ".vscode")
-    local global_patterns=()
+Bootstraps a Vite + React (+ TailwindCSS) project using Bun.
 
-    # Add patterns from global gitignore if not in a repo
-    if (( ! inside_git )); then
-        local global_ignore_file
-        global_ignore_file=$(git config --get core.excludesfile 2>/dev/null)
-        if [[ -n "$global_ignore_file" && -f "$global_ignore_file" ]]; then
-            # Read patterns, handle comments/empty lines, add dir patterns to exclude_dirs
-             while IFS= read -r pattern || [[ -n "$pattern" ]]; do # Process last line if no newline
-                pattern=$(echo "$pattern" | sed 's/^\s*//;s/\s*$//') # Trim whitespace
-                [[ -z "$pattern" || "$pattern" == \#* ]] && continue # Skip empty/comments
-                global_patterns+=("$pattern") # Add all patterns for later file checks
-                if [[ "$pattern" == */ ]]; then # If it's a directory pattern
-                    pattern="${pattern%/}" # Remove trailing /
-                    # Add to exclude_dirs if not already present
-                    local found=0; for ed in "${exclude_dirs[@]}"; do [[ "$ed" == "$pattern" ]] && found=1 && break; done; (( ! found )) && exclude_dirs+=("$pattern")
-                fi
-            done < "$global_ignore_file"
+Options:
+  --ts, --typescript      Use the React + TypeScript template (react-ts)
+  -o, --open              Open the project in VS Code (runs "code .") before dev server
+  -m, --modules <pkgs>    Space-separated list of additional npm packages to install
+  -h, --help              Show this help message and exit
+
+Examples:
+  vite-react my-app
+  vite-react --ts my-app
+  vite-react -m motion @supabase/supabase-js my-app
+  vite-react --ts -m sonner -o my-app
+EOF
+        return 0
+        ;;
+      --ts|--typescript)
+        ts_flag=1
+        shift
+        ;;
+      -o|--open)
+        open_code=1
+        shift
+        ;;
+      -m|--modules)
+        shift
+        if [[ $# -eq 0 || "$1" == -* ]]; then
+          echo "Error: --modules requires at least one module name." >&2
+          return 1
         fi
-    fi
-
-    process_file() {
-        local file="$1"
-        # Basic checks
-        [[ ! -f "$file" ]] && return 0 # Skip non-files silently
-
-        # Mime type check (more robust than just 'text')
-        local mime
-        mime=$(file -b --mime-type "$file")
-        [[ $mime != text/* && $mime != application/json && $mime != application/xml && $mime != application/javascript && $mime != inode/x-empty ]] && return 0
-
-        # Directory exclusion check (including path components)
-        local component
-        for component in $(echo "$file" | tr '/' ' '); do
-            for ed in "${exclude_dirs[@]}"; do
-                [[ "$component" == "$ed" ]] && return 0
-            done
+        while [[ $# -gt 0 && "$1" != -* ]]; do
+          extra_modules+=("$1")
+          shift
         done
-
-        # Git ignore check
-        if (( inside_git )); then
-            git check-ignore -q "$file" && return 0
-        else
-            # Check against global non-dir patterns if not in git repo
-            for pattern in "${global_patterns[@]}"; do
-                [[ "$pattern" == */ ]] && continue # Skip dir patterns here
-                # Simple wildcard matching (can be improved with more complex gitignore logic if needed)
-                 if [[ "$file" == $pattern ]]; then # Basic globbing check
-                     return 0
-                 fi
-            done
+        ;;
+      -*)
+        echo "Unknown option: $1" >&2
+        return 1
+        ;;
+      *)
+        if [[ -n "$app_name" ]]; then
+          echo "Error: multiple app names supplied: '$app_name' and '$1'." >&2
+          return 1
         fi
+        app_name="$1"
+        shift
+        ;;
+    esac
+  done
 
-        # Get absolute path
-        local abs_path
-         if command -v realpath &>/dev/null; then abs_path=$(realpath "$file")
-         elif command -v greadlink &>/dev/null; then abs_path=$(greadlink -f "$file") # gnu readlink on macos
-         else perl -MCwd -e 'print Cwd::abs_path(shift)' "$file"; fi # perl fallback
+  # 2. Validate app name & environment
+  if [[ -z "$app_name" ]]; then
+    echo "Usage: vite-react [options] <app-name>" >&2
+    return 1
+  fi
+  if [[ -e "$app_name" ]]; then
+    echo "✖︎ '$app_name' already exists." >&2
+    return 1
+  fi
+  command -v bun >/dev/null || {
+    echo "✖︎ Bun is not installed / not in PATH." >&2
+    return 1
+  }
 
-        {
-            echo "--- START FILE: $abs_path ---"
-            cat "$file"
-            echo "--- END FILE: $abs_path ---"
-            echo "" # Add a blank line between files
-        } >> "$tmp_output"
-    }
+  # 3. Create the project
+  echo "› Creating Vite project '$app_name' …"
+  if (( ts_flag )); then
+    bun create vite@latest "$app_name" --template react-ts
+  else
+    bun create vite@latest "$app_name" --template react
+  fi
+  cd "$app_name"
 
-    for target in "${targets[@]}"; do
-        if [[ -d "$target" ]]; then
-            if (( recursive )); then
-                # Build find command with pruning for efficiency
-                local find_args=("$target")
-                # Add path pruning for each exclude_dir
-                if [[ ${#exclude_dirs[@]} -gt 0 ]]; then
-                    find_args+=( \( -name "${exclude_dirs[1]}" ) # Start with first exclude dir
-                    for (( i=1; i<${#exclude_dirs[@]}; i++ )); do
-                        find_args+=( -o -name "${exclude_dirs[i+1]}" )
-                    done
-                    find_args+=( -type d \) -prune -o ) # Prune if name matches, OR continue
-                fi
-                 find_args+=( -type f -print ) # Find files
+  # 4. Install Tailwind and optional extra modules
+  echo "› Installing TailwindCSS (and extras) …"
+  bun add tailwindcss @tailwindcss/vite "${extra_modules[@]}"
 
-                # Use find -print0 and read -d '' for safer handling of filenames with spaces/newlines
-                while IFS= read -r -d $'\0' f; do
-                    process_file "$f"
-                done < <(find "${find_args[@]}" -print0)
-            else
-                 echo "Warning: '$target' is a directory, use -r to process recursively. Skipping." >&2
-            fi
-        elif [[ -f "$target" ]]; then
-            process_file "$target"
-        else
-            echo "Warning: '$target' not found or not a file/directory. Skipping." >&2
-        fi
-    done
+  # 5. Rewrite vite.config.[ts|js]
+  local vite_cfg
+  if [[ -f vite.config.ts ]]; then
+    vite_cfg="vite.config.ts"
+  elif [[ -f vite.config.js ]]; then
+    vite_cfg="vite.config.js"
+  else
+    echo "✖︎ vite.config.[ts|js] not found." >&2
+    return 1
+  fi
 
-    if [[ -s "$tmp_output" ]]; then # Check if file has content
-        pbcopy < "$tmp_output"
-        cat "$tmp_output"
-        echo -e "\n--- Combined content copied to clipboard. ---"
-    else
-         echo "No text files found or processed."
-    fi
+  cat > "$vite_cfg" << 'EOF'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 
-    # No need for explicit rm, trap handles it
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+});
+EOF
+  echo "› Rewrote $vite_cfg"
+
+  # 6. Overwrite src/index.css
+  cat > src/index.css << 'EOF'
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&family=IBM+Plex+Mono:wght@300;400;500;600;700&family=JetBrains+Mono:wght@100..800&display=swap");
+@import "tailwindcss";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+@theme {
+  --font-geist: "Geist", sans-serif;
+  --font-geist-mono: "Geist Mono", monospace;
+  --font-jetbrains-mono: "JetBrains Mono", monospace;
+  --font-plex-mono: "IBM Plex Mono", monospace;
+}
+EOF
+  echo "› Rewrote src/index.css"
+
+  # 7. Remove App.css & rewrite App component
+  rm -f src/App.css
+
+  local app_file
+  if [[ -f src/App.tsx ]]; then
+    app_file="src/App.tsx"
+  elif [[ -f src/App.jsx ]]; then
+    app_file="src/App.jsx"
+  else
+    echo "✖︎ App component not found." >&2
+    return 1
+  fi
+
+  cat > "$app_file" << 'EOF'
+import { useState, useEffect } from "react";
+
+function App() {
+  return <></>;
+}
+
+export default App;
+EOF
+  echo "› Rewrote $app_file (and removed src/App.css)"
+
+  # 8. Final install & dev server
+  echo "› Running final bun install …"
+  bun install
+
+  if (( open_code )); then
+    command -v code >/dev/null && code .
+  fi
+
+  echo "✓ Project ready – starting dev server (Ctrl‑C to quit)"
+  bun run dev --open
+}
 
 # -- Plugin & Completion Initialization --
 
@@ -778,10 +823,10 @@ autoload -z edit-command-line && zle -N edit-command-line && bindkey "^X^E" edit
 # Check if cache needs update (e.g., if ~/.zshrc or completion files are newer)
 # Simple check: if zcompdump is older than zshrc or doesn't exist
 if [[ ! -f ~/.zcompdump || ~/.zshrc -nt ~/.zcompdump ]]; then
-  autoload -Uz compinit && compinit
+  autoload -Uz compinit && compinit -i
   echo "Completion cache rebuilt." # Optional message
 else
-  autoload -Uz compinit && compinit -C
+  autoload -Uz compinit && compinit -C -i
 fi
 
 # Prompt (PS1)
