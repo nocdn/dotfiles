@@ -32,6 +32,26 @@ npm-debug.log*
 *.sublime-workspace
 .vscode
 .zed
+*.swp
+*.swo
+*~
+#*#
+
+# build/dist
+build/
+dist/
+out/
+target/
+coverage/
+
+# cache
+.cache/
+.parcel-cache/
+.webpack/
+.svelte-kit/
+.nuxt/
+.vite/
+.astro/
 
 # node
 node_modules
@@ -45,8 +65,11 @@ venv
 # secrets
 secrets.json
 .env
+.env.*local
 
 # third party services
 .vercel/
 .next/
 .github/
+.aws-sam/
+.serverless/

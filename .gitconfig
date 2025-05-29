@@ -3,5 +3,5 @@
 	name = Kayetic
 
 [core]
-	editor = nano
+	editor = nvim
 	excludesfile = ~/.gitignore_global
