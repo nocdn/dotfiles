@@ -598,11 +598,11 @@ upload() {
 }
 
 # vite-react
-# Bootstrap a Vite + React (+ TailwindCSS) project using Bun.
+# bootstrap a vite + react + tailwindcss (+ some mono fonts) project using bun
 function vite-react() {
-  set -euo pipefail
+  emulate -L zsh -o err_exit -o nounset -o pipe_fail   # make options local
 
-  # 1. Parse CLI flags / arguments
+  # 1. parse cli flags / arguments
   local ts_flag=0
   local open_code=0
   local -a extra_modules=()
@@ -617,31 +617,19 @@ Usage: vite-react [options] <app-name>
 Bootstraps a Vite + React (+ TailwindCSS) project using Bun.
 
 Options:
-  --ts, --typescript      Use the React + TypeScript template (react-ts)
-  -o, --open              Open the project in VS Code (runs "code .") before dev server
-  -m, --modules <pkgs>    Space-separated list of additional npm packages to install
-  -h, --help              Show this help message and exit
-
-Examples:
-  vite-react my-app
-  vite-react --ts my-app
-  vite-react -m motion @supabase/supabase-js my-app
-  vite-react --ts -m sonner -o my-app
+  -ts, --typescript      Use the React + TypeScript template (react-ts)
+  -o, --open             Open the project in VS Code (runs "code .") before dev server
+  -m, --modules <pkgs>   Space-separated list of additional npm packages to install
+  -h, --help             Show this help message and exit
 EOF
         return 0
         ;;
-      --ts|--typescript)
-        ts_flag=1
-        shift
-        ;;
-      -o|--open)
-        open_code=1
-        shift
-        ;;
+      -ts|--typescript) ts_flag=1; shift ;;
+      -o|--open)        open_code=1; shift ;;
       -m|--modules)
         shift
         if [[ $# -eq 0 || "$1" == -* ]]; then
-          echo "Error: --modules requires at least one module name." >&2
+          echo "error: --modules requires at least one module name" >&2
           return 1
         fi
         while [[ $# -gt 0 && "$1" != -* ]]; do
@@ -649,13 +637,10 @@ EOF
           shift
         done
         ;;
-      -*)
-        echo "Unknown option: $1" >&2
-        return 1
-        ;;
+      -*) echo "unknown option: $1" >&2; return 1 ;;
       *)
         if [[ -n "$app_name" ]]; then
-          echo "Error: multiple app names supplied: '$app_name' and '$1'." >&2
+          echo "error: multiple app names supplied: '$app_name' and '$1'" >&2
           return 1
         fi
         app_name="$1"
@@ -664,22 +649,22 @@ EOF
     esac
   done
 
-  # 2. Validate app name & environment
+  # 2. validate app name & environment
   if [[ -z "$app_name" ]]; then
-    echo "Usage: vite-react [options] <app-name>" >&2
+    echo "usage: vite-react [options] <app-name>" >&2
     return 1
   fi
   if [[ -e "$app_name" ]]; then
-    echo "✖︎ '$app_name' already exists." >&2
+    echo "✖︎ '$app_name' already exists" >&2
     return 1
   fi
   command -v bun >/dev/null || {
-    echo "✖︎ Bun is not installed / not in PATH." >&2
+    echo "✖︎ bun is not installed / not in path" >&2
     return 1
   }
 
-  # 3. Create the project
-  echo "› Creating Vite project '$app_name' …"
+  # 3. create the project
+  echo "› creating vite project '$app_name' …"
   if (( ts_flag )); then
     bun create vite@latest "$app_name" --template react-ts
   else
@@ -687,18 +672,18 @@ EOF
   fi
   cd "$app_name"
 
-  # 4. Install Tailwind and optional extra modules
-  echo "› Installing TailwindCSS (and extras) …"
+  # 4. install tailwind and optional extra modules
+  echo "› installing tailwindcss (and extras) …"
   bun add tailwindcss @tailwindcss/vite "${extra_modules[@]}"
 
-  # 5. Rewrite vite.config.[ts|js]
+  # 5. rewrite vite.config.[ts|js]
   local vite_cfg
   if [[ -f vite.config.ts ]]; then
     vite_cfg="vite.config.ts"
   elif [[ -f vite.config.js ]]; then
     vite_cfg="vite.config.js"
   else
-    echo "✖︎ vite.config.[ts|js] not found." >&2
+    echo "✖︎ vite.config.[ts|js] not found" >&2
     return 1
   fi
 
@@ -712,9 +697,9 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
 });
 EOF
-  echo "› Rewrote $vite_cfg"
+  echo "› rewrote $vite_cfg"
 
-  # 6. Overwrite src/index.css
+  # 6. overwrite src/index.css
   cat > src/index.css << 'EOF'
 @import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&family=IBM+Plex+Mono:wght@300;400;500;600;700&family=JetBrains+Mono:wght@100..800&display=swap");
 @import "tailwindcss";
@@ -737,9 +722,9 @@ EOF
   --font-plex-mono: "IBM Plex Mono", monospace;
 }
 EOF
-  echo "› Rewrote src/index.css"
+  echo "› rewrote src/index.css"
 
-  # 7. Remove App.css & rewrite App component
+  # 7. remove App.css & rewrite App component
   rm -f src/App.css
 
   local app_file
@@ -748,7 +733,7 @@ EOF
   elif [[ -f src/App.jsx ]]; then
     app_file="src/App.jsx"
   else
-    echo "✖︎ App component not found." >&2
+    echo "✖︎ app component not found" >&2
     return 1
   fi
 
@@ -761,17 +746,19 @@ function App() {
 
 export default App;
 EOF
-  echo "› Rewrote $app_file (and removed src/App.css)"
+  echo "› rewrote $app_file (and removed src/App.css)"
 
-  # 8. Final install & dev server
-  echo "› Running final bun install …"
+  # 8. final install & dev server
+  echo "› running final bun install …"
   bun install
 
   if (( open_code )); then
     command -v code >/dev/null && code .
   fi
 
-  echo "✓ Project ready – starting dev server (Ctrl‑C to quit)"
+  echo "✓ project ready – starting dev server (ctrl‑c to quit)"
+
+  unsetopt err_exit   # turn off “exit on error” so ctrl‑c doesn’t kill the shell
   bun run dev --open
 }
 
@@ -831,3 +818,8 @@ fi
 
 # Prompt (PS1)
 PS1="%F{reset}%n %F{blue}%~ %F{reset}%# %F"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/bartek/.lmstudio/bin"
+# End of LM Studio CLI section
+
