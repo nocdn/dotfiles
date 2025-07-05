@@ -1,7 +1,0 @@
-[user]
-	email = bartek.bak@protonmail.com
-	name = Kayetic
-
-[core]
-	editor = nvim
-	excludesfile = ~/.gitignore_global

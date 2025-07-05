@@ -29,12 +29,12 @@ export PATH="$HOME/Library/pnpm:$PATH" # PNPM path
 export NVM_DIR="$HOME/.nvm" # Set NVM_DIR path for lazy loading function
 export EDITOR=/opt/homebrew/bin/nvim
 export MINIO_CONFIG_ENV_FILE=/etc/default/minio
-export EXA_COLORS="di=38;5;117:ex=38;5;177:no=00:da=0;0:sn=0;0" # eza colors
+export EXA_COLORS="di=38;5;33:ex=38;5;177:no=00:da=0;0:sn=0;0"
 
 # -- Aliases --
 # General
 alias ls="eza"
-alias la="eza -l --no-permissions --no-user --no-filesize --sort=date"
+alias la="eza -l --no-permissions --no-user --sort=date"
 alias laa="eza -la --no-permissions --no-user --sort=date"
 alias zshconfig="code ~/.zshrc"
 alias reload="source ~/.zshrc"
@@ -758,18 +758,96 @@ EOF
 
   echo "✓ project ready – starting dev server (ctrl‑c to quit)"
 
-  unsetopt err_exit   # turn off “exit on error” so ctrl‑c doesn’t kill the shell
+  unsetopt err_exit   # turn off "exit on error" so ctrl‑c doesn't kill the shell
   bun run dev --open
 }
 
+ytdlp_ai() {
+  read "url?youtube url: "
+  [[ -z $url ]] && { echo "url required"; return 1; }
+
+  read "instructions?download instructions: "
+  [[ -z $instructions ]] && { echo "instructions required"; return 1; }
+
+  command -v jq >/dev/null || { echo "jq not found (brew install jq)"; return 1; }
+  command -v yt-dlp >/dev/null || { echo "yt-dlp not found (brew install yt-dlp)"; return 1; }
+
+  echo "› fetching available formats..."
+  local formats_list
+  formats_list=$(yt-dlp -F "$url")
+  if [[ $? -ne 0 || -z "$formats_list" ]]; then
+    echo "✖︎ failed to fetch formats for the given URL." >&2
+    return 1
+  fi
+
+  local MODEL_ID="gemini-2.5-flash"
+  local API_KEY="${GEMINI_API_KEY:-AIzaSyDwfXWrKaIYRefJhzXkkEoODTOG52y6d0U}"
+  local ENDPOINT="https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${API_KEY}"
+
+  local user_prompt="URL: \"$url\"
+
+Instructions: \"$instructions\"
+
+Available formats:
+---
+$formats_list
+---"
+
+  local system_prompt_text="You are a helpful assistant that generates yt-dlp commands. The user will provide a youtube URL, download instructions, and the complete output of 'yt-dlp --list-formats'. From these, construct a single, executable yt-dlp command.
+
+Rules:
+1.  Analyze the user's instructions (e.g., 'audio only', 'low quality', 'mp3').
+2.  Examine the 'Available formats' list and select the BEST format ID that matches the user's request.
+3.  If the user asks for a specific format (like mp3) that requires post-processing (--extract-audio --audio-format mp3), you must select a compatible audio-only format from the list for the '-f' flag (e.g., format ID '251' which is opus) and then add the necessary post-processing flags. Do not try to select mp3 directly in the '-f' flag if it is not available as a raw format.
+4.  The value for the '-f' flag MUST be wrapped in single quotes (e.g., -f '251' or -f '140').
+5.  Do NOT use generic or non-existent formats like 'bestaudio' or 'worstaudio'. Pick a specific format ID from the list.
+6.  Return ONLY the final, complete yt-dlp command. Do not add explanations, backticks, or markdown."
+  local payload
+  payload=$(jq -n --arg prompt "$user_prompt" --arg system_prompt "$system_prompt_text" '
+    {
+      system_instruction: {
+        parts: [
+          {text: $system_prompt}
+        ]
+      },
+      contents: [
+        {role: "user", parts: [{text: $prompt}]}
+      ],
+      generationConfig: {
+        thinkingConfig: {thinkingBudget: 0},
+        responseMimeType: "text/plain"
+      }
+    }')
+
+  echo "› asking ai for the command..."
+  local response
+  response=$(curl -s -X POST -H "Content-Type: application/json" -d "$payload" "$ENDPOINT")
+
+  local cmd
+  cmd=$(echo "$response" | jq -r '.candidates[0].content.parts[0].text // empty')
+
+  [[ -z $cmd || $cmd == "null" ]] && {
+    echo "could not parse yt-dlp command from model"
+    echo "$response"
+    return 1
+  }
+
+  echo "--- generated command ---"
+  echo "$cmd"
+  read "go?run this command? [Y/n]: "
+  [[ $go == [nN] ]] && { echo "aborted"; return; }
+
+  setopt local_options noglob
+  eval "$cmd"
+}
+
+
 # -- Plugin & Completion Initialization --
 
-# zsh-autosuggestions (manual install)
-# Sourcing plugins always adds some startup time. This is generally fast though.
-ZSH_AUTOSUGGEST_MANUAL_INSTALL_DIR="$HOME/.zsh/zsh-autosuggestions"
-if [[ -f "$ZSH_AUTOSUGGEST_MANUAL_INSTALL_DIR/zsh-autosuggestions.zsh" ]]; then
-  source "$ZSH_AUTOSUGGEST_MANUAL_INSTALL_DIR/zsh-autosuggestions.zsh"
-fi
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#aaaaaa"
+
+source ~/.orbstack/shell/init.zsh
 
 # fzf keybindings and fuzzy completion
 # Running <(...) executes command, source loads output. Adds startup time.
@@ -823,3 +901,6 @@ PS1="%F{reset}%n %F{blue}%~ %F{reset}%# %F"
 export PATH="$PATH:/Users/bartek/.lmstudio/bin"
 # End of LM Studio CLI section
 
+alias breath='zenta now --quick'
+alias breathe='zenta now'
+alias reflect='zenta reflect'
