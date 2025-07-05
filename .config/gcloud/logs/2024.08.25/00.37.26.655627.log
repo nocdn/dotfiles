@@ -1,5 +1,0 @@
-2024-08-25 00:37:26,674 DEBUG    root            Loaded Command Group: ['gcloud', 'compute']
-2024-08-25 00:37:26,676 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances']
-2024-08-25 00:37:26,834 DEBUG    root            Loaded Command Group: ['gcloud', 'compute', 'instances', 'create']
-2024-08-25 00:37:26,902 ERROR    root            (gcloud.compute.instances.create) argument --boot-disk-size: unit must be one of B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB; received: GBG
-2024-08-25 00:37:26,909 DEBUG    root            Metrics reporting process started...

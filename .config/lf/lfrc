@@ -1,5 +1,0 @@
-map c :mkdir
-map d :delete
-
-set EDITOR nvim
-
