@@ -170,12 +170,8 @@ done
 ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-$ZSH_VERSION"
 mkdir -p "${ZSH_COMPDUMP:h}"
 
-if typeset -f zsh-defer >/dev/null 2>&1; then
-  zsh-defer 'autoload -Uz compinit; compinit -C -d "$ZSH_COMPDUMP"'
-else
-  autoload -Uz compinit
-  compinit -C -d "$ZSH_COMPDUMP"
-fi
+autoload -Uz compinit
+compinit -C -d "$ZSH_COMPDUMP"
 
 _zsh_autosuggestions_script=""
 for candidate in \
@@ -223,6 +219,20 @@ _nvm_load() {
   return 0
 }
 
+_run_after_nvm_load() {
+  local command_name="$1"
+  shift
+
+  _nvm_load
+
+  if command -v "$command_name" >/dev/null 2>&1; then
+    command "$command_name" "$@"
+  else
+    echo "Error: $command_name is not installed." >&2
+    return 1
+  fi
+}
+
 nvm() {
   _nvm_load
   if ! typeset -f nvm >/dev/null 2>&1; then
@@ -233,18 +243,15 @@ nvm() {
 }
 
 node() {
-  _nvm_load
-  command node "$@"
+  _run_after_nvm_load node "$@"
 }
 
 npm() {
-  _nvm_load
-  command npm "$@"
+  _run_after_nvm_load npm "$@"
 }
 
 npx() {
-  _nvm_load
-  command npx "$@"
+  _run_after_nvm_load npx "$@"
 }
 
 if command -v zoxide >/dev/null 2>&1; then
