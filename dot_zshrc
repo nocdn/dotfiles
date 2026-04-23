@@ -42,6 +42,8 @@ alias brb='bun run build'
 alias dsp='docker system prune -a -f'
 alias dcup='docker compose up'
 
+[[ -f "${ZDOTDIR:-$HOME}/.zsh/functions.zsh" ]] && source "${ZDOTDIR:-$HOME}/.zsh/functions.zsh"
+
 export EZA_COLORS="di=38;5;33:ex=38;5;177:no=00:da=0;0:sn=0;0"
 
 source ~/.zsh/zsh-defer/zsh-defer.plugin.zsh

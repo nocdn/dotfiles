@@ -131,10 +131,11 @@ alias dcup='docker compose up'
 alias dcupd='docker compose up -d'
 alias dcdown='docker compose down'
 alias dclogs='docker compose logs -f'
-alias dps='docker ps'
 alias dimg='docker images'
 alias dexec='docker exec -it'
 alias dsp='docker system prune -a -f'
+
+[[ -f "${ZDOTDIR:-$HOME}/.zsh/functions.zsh" ]] && source "${ZDOTDIR:-$HOME}/.zsh/functions.zsh"
 
 if [[ -f "$HOME/.zsh/zsh-defer/zsh-defer.plugin.zsh" ]]; then
   source "$HOME/.zsh/zsh-defer/zsh-defer.plugin.zsh"
