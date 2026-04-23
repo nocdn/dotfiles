@@ -1,3 +1,4 @@
+{{- if eq .chezmoi.os "darwin" -}}
 # Added by ForgeCode installer
 export PATH="/Users/bartosz/.local/bin:$PATH"
 export PATH="$HOME/.local/bin:$HOME/.bun/bin:$PATH"
@@ -221,3 +222,4 @@ yt-dl() {
 
 # bun completions
 [ -s "/Users/bartosz/.bun/_bun" ] && source "/Users/bartosz/.bun/_bun"
+{{- end -}}
