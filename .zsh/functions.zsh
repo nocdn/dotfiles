@@ -1,4 +1,16 @@
-alias dps="docker ps --size --format '{{.ID}}\n{{.Names}}\nCommand: {{.Command}}\nImage: {{.Image}}\nCreatedAt: {{.CreatedAt}}\nStatus: {{.Status}}\nPorts: {{.Ports}}\nSize: {{.Size}}\n'"
+dps() {
+  if ! command -v docker >/dev/null 2>&1; then
+    echo "Error: docker is not installed. Please install it first." >&2
+    return 1
+  fi
+
+  if ! command docker info >/dev/null 2>&1; then
+    echo "Error: Docker daemon is not running." >&2
+    return 1
+  fi
+
+  command docker ps --size --format '{{.ID}}\n{{.Names}}\nCommand: {{.Command}}\nImage: {{.Image}}\nCreatedAt: {{.CreatedAt}}\nStatus: {{.Status}}\nPorts: {{.Ports}}\nSize: {{.Size}}\n'
+}
 
 dpsf() {
   if ! command -v fzf >/dev/null 2>&1; then

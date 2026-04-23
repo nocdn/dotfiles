@@ -263,6 +263,13 @@ mkcd() {
   mkdir -p -- "$1" && cd -- "$1"
 }
 
+_extract_require() {
+  command -v "$1" >/dev/null 2>&1 || {
+    echo "extract: missing command: $1" >&2
+    return 1
+  }
+}
+
 extract() {
   [[ -f "$1" ]] || {
     echo "Usage: extract <archive>" >&2
@@ -270,18 +277,18 @@ extract() {
   }
 
   case "$1" in
-    *.tar.bz2|*.tbz2) tar xjf "$1" ;;
-    *.tar.gz|*.tgz) tar xzf "$1" ;;
-    *.tar.xz|*.txz) tar xJf "$1" ;;
-    *.tar.zst|*.tzst) tar --zstd -xf "$1" ;;
-    *.tar) tar xf "$1" ;;
-    *.bz2) bunzip2 "$1" ;;
-    *.gz) gunzip "$1" ;;
-    *.xz) unxz "$1" ;;
-    *.zst) unzstd "$1" ;;
-    *.zip) unzip "$1" ;;
-    *.rar) unrar x "$1" ;;
-    *.7z) 7z x "$1" ;;
+    *.tar.bz2|*.tbz2) _extract_require tar && tar xjf "$1" ;;
+    *.tar.gz|*.tgz) _extract_require tar && tar xzf "$1" ;;
+    *.tar.xz|*.txz) _extract_require tar && tar xJf "$1" ;;
+    *.tar.zst|*.tzst) _extract_require tar && _extract_require zstd && tar --zstd -xf "$1" ;;
+    *.tar) _extract_require tar && tar xf "$1" ;;
+    *.bz2) _extract_require bunzip2 && bunzip2 "$1" ;;
+    *.gz) _extract_require gunzip && gunzip "$1" ;;
+    *.xz) _extract_require unxz && unxz "$1" ;;
+    *.zst) _extract_require unzstd && unzstd "$1" ;;
+    *.zip) _extract_require unzip && unzip "$1" ;;
+    *.rar) _extract_require unrar && unrar x "$1" ;;
+    *.7z) _extract_require 7z && 7z x "$1" ;;
     *)
       echo "extract: unsupported archive format: $1" >&2
       return 1
