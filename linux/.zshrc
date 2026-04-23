@@ -248,11 +248,7 @@ npx() {
 }
 
 if command -v zoxide >/dev/null 2>&1; then
-  if typeset -f zsh-defer >/dev/null 2>&1; then
-    zsh-defer 'eval "$(zoxide init zsh --cmd cd)"'
-  else
-    eval "$(zoxide init zsh --cmd cd)"
-  fi
+  eval "$(zoxide init zsh --cmd cd)"
 fi
 
 mkcd() {
