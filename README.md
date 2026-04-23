@@ -20,14 +20,15 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 Install the tools used by the zsh config:
 
 ```zsh
-brew install chezmoi eza fzf zoxide zsh-autosuggestions
+brew install chezmoi eza fzf zoxide
 ```
 
-Install the plugin this repo expects from Git:
+Install the plugins this repo expects from Git:
 
 ```zsh
 mkdir -p ~/.zsh
 git clone https://github.com/romkatv/zsh-defer ~/.zsh/zsh-defer
+git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
 ```
 
 Apply the dotfiles:
