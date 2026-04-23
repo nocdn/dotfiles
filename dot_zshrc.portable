@@ -92,7 +92,7 @@ setopt NO_CASE_GLOB
 export EDITOR="nvim"
 export VISUAL="nvim"
 
-PROMPT='%n@%m %F{green}%1~%f %# '
+PROMPT='%B%F{green}%n@%m%f%b:%B%F{blue}%~%f%b %(!.#.$) '
 
 alias reload='source ~/.zshrc'
 
