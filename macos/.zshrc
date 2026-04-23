@@ -1,8 +1,15 @@
-{{- if eq .chezmoi.os "darwin" -}}
 # Added by ForgeCode installer
 export PATH="/Users/bartosz/.local/bin:$PATH"
 export PATH="$HOME/.local/bin:$HOME/.bun/bin:$PATH"
 export BUN_INSTALL="$HOME/.bun"
+
+# Homebrew: reduce noisy hints and automatic side effects
+export HOMEBREW_NO_ENV_HINTS=1
+export HOMEBREW_NO_UPDATE_REPORT_NEW=1
+export HOMEBREW_NO_ANALYTICS=1
+export HOMEBREW_NO_EMOJI=1
+export HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 [[ -f "$HOME/.config/zsh/secrets.zsh" ]] && source "$HOME/.config/zsh/secrets.zsh"
 
@@ -222,4 +229,3 @@ yt-dl() {
 
 # bun completions
 [ -s "/Users/bartosz/.bun/_bun" ] && source "/Users/bartosz/.bun/_bun"
-{{- end -}}

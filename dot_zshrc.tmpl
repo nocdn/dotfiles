@@ -1,9 +1,0 @@
-{{- if eq .chezmoi.os "darwin" }}
-if [[ -f "$HOME/.config/zsh/macos.zsh" ]]; then
-  source "$HOME/.config/zsh/macos.zsh"
-elif [[ -f "$HOME/.zshrc.portable" ]]; then
-  source "$HOME/.zshrc.portable"
-fi
-{{- else }}
-[[ -f "$HOME/.zshrc.portable" ]] && source "$HOME/.zshrc.portable"
-{{- end }}

@@ -10,6 +10,15 @@ chsh -s "$(command -v zsh)"
 exec zsh
 ```
 
+When `zsh-newuser-install` appears, press `q`.
+
+Clone the repo wherever you want, for example:
+
+```zsh
+git clone https://github.com/nocdn/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+```
+
 Install Homebrew on Linux:
 
 ```zsh
@@ -20,7 +29,7 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 Install the tools used by the zsh config:
 
 ```zsh
-brew install chezmoi eza fzf zoxide
+brew install eza fzf zoxide
 ```
 
 Install the plugins this repo expects from Git:
@@ -29,16 +38,34 @@ Install the plugins this repo expects from Git:
 mkdir -p ~/.zsh
 git clone https://github.com/romkatv/zsh-defer ~/.zsh/zsh-defer
 git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
+ln -sfn ~/dotfiles/.zsh/functions.zsh ~/.zsh/functions.zsh
 ```
 
-Apply the dotfiles:
+Pick the zsh config you want and symlink it:
+
+Linux:
 
 ```zsh
-chezmoi init --apply YOUR_GITHUB_USERNAME
+ln -sfn ~/dotfiles/linux/.zshrc ~/.zshrc
 exec zsh
 ```
 
-Install nvm, then Node LTS and npm:
+macOS:
+
+```zsh
+ln -sfn ~/dotfiles/macos/.zshrc ~/.zshrc
+exec zsh
+```
+
+If you pull new changes later:
+
+```zsh
+cd ~/dotfiles
+git pull
+exec zsh
+```
+
+Install runtimes:
 
 ```zsh
 PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash'
@@ -46,22 +73,26 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 nvm install --lts
 nvm alias default 'lts/*'
-node -v
-npm -v
 ```
 
 Install Bun:
 
 ```zsh
 curl -fsSL https://bun.com/install | bash
-exec zsh
-bun --version
 ```
 
 Install zerobrew:
 
 ```zsh
 curl -fsSL https://zerobrew.rs/install | bash -s -- --no-modify-path
+```
+
+Reload and verify:
+
+```zsh
 exec zsh
+node -v
+npm -v
+bun --version
 zb --version
 ```

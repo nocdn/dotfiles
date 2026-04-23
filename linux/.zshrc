@@ -1,5 +1,5 @@
-# Portable Zsh config
-# Install on new machines:
+# Linux Zsh config
+# Common tools:
 # - zsh
 # - git
 # - neovim
