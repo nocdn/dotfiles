@@ -1,0 +1,221 @@
+# Added by ForgeCode installer
+export PATH="/Users/bartosz/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.bun/bin:$PATH"
+export BUN_INSTALL="$HOME/.bun"
+
+[[ -f "$HOME/.config/zsh/secrets.zsh" ]] && source "$HOME/.config/zsh/secrets.zsh"
+
+HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
+mkdir -p "${HISTFILE:h}"
+HISTSIZE=100000
+SAVEHIST=100000
+
+setopt EXTENDED_HISTORY      # store timestamps + duration
+setopt SHARE_HISTORY         # share history across sessions
+setopt HIST_IGNORE_ALL_DUPS  # keep only most recent duplicate
+setopt HIST_REDUCE_BLANKS    # normalize spacing
+setopt HIST_IGNORE_SPACE     # leading-space commands won’t be saved
+setopt HIST_FIND_NO_DUPS     # don’t show dupes while searching history
+
+export EDITOR="nvim"
+export VISUAL="nvim"
+
+PROMPT='%n@%m %F{205}%1~%f %# '
+
+alias reload='source ~/.zshrc'
+alias configure='code ~/.zshrc'
+alias config='code ~/.zshrc'
+
+# eza
+alias ls='eza --color=auto --group-directories-first'
+alias ll='eza -l --group-directories-first'
+
+# git
+alias gs='git status'
+alias gc='git commit'
+
+# bun
+alias brd='bun run dev'
+alias brb='bun run build'
+
+# docker
+alias dsp='docker system prune -a -f'
+alias dcup='docker compose up'
+
+export EZA_COLORS="di=38;5;33:ex=38;5;177:no=00:da=0;0:sn=0;0"
+
+source ~/.zsh/zsh-defer/zsh-defer.plugin.zsh
+
+# bun completions: autoload (don't source)
+[[ -f "$HOME/.bun/_bun" ]] && fpath=("$HOME/.bun" $fpath)
+
+# completion system: defer + cache + -C
+ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-$ZSH_VERSION"
+mkdir -p "${ZSH_COMPDUMP:h}"
+zsh-defer 'autoload -Uz compinit; compinit -C -d "$ZSH_COMPDUMP"'
+
+export NVM_DIR="$HOME/.nvm"
+_nvm_load() {
+  unset -f nvm node npm npx
+  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"
+}
+nvm()  { _nvm_load; nvm  "$@"; }
+node() { _nvm_load; command node "$@"; }
+npm()  { _nvm_load; command npm  "$@"; }
+npx()  { _nvm_load; command npx  "$@"; }
+
+ZSH_AUTOSUGGEST_STRATEGY=(history)
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+zsh-defer source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+zsh-defer _zsh_autosuggest_bind_widgets
+
+_zoxide_load() {
+  unset -f _zoxide_load cd cdi 2>/dev/null
+
+  local cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zoxide-init-cd.zsh"
+  mkdir -p "${cache:h}"
+
+  local zoxide_bin
+  zoxide_bin="$(command -v zoxide 2>/dev/null)" || return 0
+
+  if [[ ! -f "$cache" || "$cache" -ot "$zoxide_bin" ]]; then
+    command zoxide init zsh --cmd cd --hook pwd >| "$cache"
+  fi
+
+  source "$cache"
+}
+
+cd()  { _zoxide_load; cd  "$@"; }
+cdi() { _zoxide_load; cdi "$@"; }
+
+# fzf history picker: fills the current command line
+hist() {
+  local -a fzf_opts=(--tac --no-sort --height=40% --reverse --prompt='history> ' --bind='ctrl-r:toggle-sort')
+  [[ "$1" == (-e|--exact) ]] && fzf_opts+=(--exact)
+  local selected
+  selected=$(fc -ln 1 | fzf "${fzf_opts[@]}") || return
+  print -z -- "$selected"
+}
+
+_hist-widget() {
+  local selected
+  selected=$(
+    fc -ln 1 | fzf --tac --no-sort \
+      --query "${LBUFFER}" \
+      --height=40% --reverse \
+      --prompt='history> ' \
+      --bind='ctrl-r:toggle-sort'
+  ) || return
+
+  BUFFER="$selected"
+  CURSOR=${#BUFFER}
+  zle redisplay
+}
+zle -N _hist-widget
+bindkey '^R' _hist-widget
+
+# Android development
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
+
+_java_load() {
+  unset -f java javac
+  export JAVA_HOME=$(/usr/libexec/java_home -v 17 2>/dev/null)
+  [[ -n "$JAVA_HOME" ]] && export PATH="$JAVA_HOME/bin:$PATH"
+}
+java()  { _java_load; command java  "$@"; }
+javac() { _java_load; command javac "$@"; }
+
+# Edit current command line in $EDITOR (Ctrl+X, Ctrl+E)
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^X^E' edit-command-line
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:$HOME/.lmstudio/bin"
+# End of LM Studio CLI section
+export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+
+# yt-dlp with LLM-generated commands
+YT_DL_DEFAULTS='Always download in mp4 format unless the user specifies otherwise. Always use the output template "%(title)s.%(ext)s" unless the user specifies a different filename or template.'
+
+yt-dl() {
+  local url="$1" instructions="$2"
+  if [[ -z "$url" ]]; then
+    echo "Error: missing video URL" >&2
+    echo "Usage: yt-dl <url> <instructions>" >&2
+    return 1
+  fi
+  if [[ -z "$instructions" ]]; then
+    echo "Error: missing download instructions" >&2
+    echo "Usage: yt-dl <url> <instructions>" >&2
+    return 1
+  fi
+  if [[ -z "$OPENAI_API_KEY" ]]; then
+    echo "Error: OPENAI_API_KEY is not set" >&2
+    return 1
+  fi
+  if ! command -v yt-dlp &>/dev/null; then
+    echo "Error: yt-dlp is not installed" >&2
+    return 1
+  fi
+
+  local manual_file="$HOME/.local/share/yt-dlp/manual.txt"
+  if [[ ! -s "$manual_file" ]]; then
+    echo "Error: yt-dlp manual not found at $manual_file" >&2
+    return 1
+  fi
+
+  local manual=$(<"$manual_file")
+
+  local payload
+  payload=$(jq -n \
+    --arg manual "$manual" \
+    --arg url "$url" \
+    --arg instructions "$instructions" \
+    --arg defaults "$YT_DL_DEFAULTS" \
+    --arg sysprompt "You are a yt-dlp command generator. Given the yt-dlp manual and a user request, output ONLY the raw yt-dlp command to run. No explanation, no markdown, no code fences. The command must start with \"yt-dlp\"." \
+    '{
+      model: "gpt-5.4-mini",
+      reasoning: { effort: "medium" },
+      input: [
+        {
+          role: "developer",
+          content: ($sysprompt + "\n\nUser'\''s preferences: " + $defaults + "\n\nyt-dlp manual:\n" + $manual)
+        },
+        {
+          role: "user",
+          content: ("URL: " + $url + "\nInstructions: " + $instructions)
+        }
+      ]
+    }')
+
+  echo "Generating command..." >&2
+  local response
+  response=$(curl -s https://api.openai.com/v1/responses \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $OPENAI_API_KEY" \
+    -d "$payload")
+
+  local cmd
+  cmd=$(echo "$response" | jq -r '
+    [.output[] | select(.type == "message") | .content[] | select(.type == "output_text") | .text]
+    | first // empty
+  ')
+
+  if [[ -z "$cmd" ]]; then
+    echo "Error: failed to generate command" >&2
+    echo "$response" | jq -r '.error.message // .' >&2
+    return 1
+  fi
+
+  echo "Command: $cmd" >&2
+  read -q "confirm?Run this command? [y/N] " || { echo >&2; return 0; }
+  echo >&2
+
+  eval "noglob $cmd"
+}
+
+
+# bun completions
+[ -s "/Users/bartosz/.bun/_bun" ] && source "/Users/bartosz/.bun/_bun"
