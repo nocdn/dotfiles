@@ -7,13 +7,16 @@
 # - fzf
 # - docker
 # - Homebrew
+# - nvm
+# - node + npm (via nvm)
+# - bun
 # - zerobrew (command: zb)
 # - zsh-defer plugin at ~/.zsh/zsh-defer
-# - zsh-autosuggestions plugin at ~/.zsh/zsh-autosuggestions
+# - zsh-autosuggestions plugin at ~/.zsh/zsh-autosuggestions or via Homebrew
 
 [[ -f "$HOME/.config/zsh/secrets.zsh" ]] && source "$HOME/.config/zsh/secrets.zsh"
 
-typeset -U path PATH
+typeset -U path PATH fpath
 
 path_prepend_if_dir() {
   [[ -d "$1" ]] && path=("$1" $path)
@@ -43,12 +46,17 @@ fi
 
 export ZEROBREW_ROOT
 export ZEROBREW_PREFIX
+export BUN_INSTALL="$HOME/.bun"
+export NVM_DIR="$HOME/.nvm"
 
 path_prepend_if_dir "$HOME/.local/bin"
 path_prepend_if_dir "$HOME/bin"
 path_prepend_if_dir "$HOME/.cargo/bin"
 path_prepend_if_dir "$HOME/go/bin"
+path_prepend_if_dir "$BUN_INSTALL/bin"
 path_prepend_if_dir "$ZEROBREW_PREFIX/bin"
+path_append_if_dir "/home/linuxbrew/.linuxbrew/bin"
+path_append_if_dir "/home/linuxbrew/.linuxbrew/sbin"
 path_append_if_dir "/opt/homebrew/bin"
 path_append_if_dir "/opt/homebrew/sbin"
 path_append_if_dir "/usr/local/bin"
@@ -145,6 +153,20 @@ if [[ -d "${ZDOTDIR:-$HOME}/.zsh/completions" ]]; then
   fpath=("${ZDOTDIR:-$HOME}/.zsh/completions" $fpath)
 fi
 
+if [[ -f "$BUN_INSTALL/_bun" ]]; then
+  fpath=("$BUN_INSTALL" $fpath)
+fi
+
+for zsh_site_functions in \
+  "/home/linuxbrew/.linuxbrew/share/zsh/site-functions" \
+  "/opt/homebrew/share/zsh/site-functions" \
+  "/usr/local/share/zsh/site-functions"
+do
+  if [[ -d "$zsh_site_functions" ]]; then
+    fpath=("$zsh_site_functions" $fpath)
+  fi
+done
+
 ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-$ZSH_VERSION"
 mkdir -p "${ZSH_COMPDUMP:h}"
 
@@ -155,19 +177,75 @@ else
   compinit -C -d "$ZSH_COMPDUMP"
 fi
 
-if [[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+_zsh_autosuggestions_script=""
+for candidate in \
+  "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+  "/home/linuxbrew/.linuxbrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+  "/opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+  "/usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+do
+  if [[ -f "$candidate" ]]; then
+    _zsh_autosuggestions_script="$candidate"
+    break
+  fi
+done
+
+if [[ -n "$_zsh_autosuggestions_script" ]]; then
   ZSH_AUTOSUGGEST_STRATEGY=(history)
   ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
   ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 
   if typeset -f zsh-defer >/dev/null 2>&1; then
-    zsh-defer source "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    zsh-defer source "$_zsh_autosuggestions_script"
     zsh-defer _zsh_autosuggest_bind_widgets
   else
-    source "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    source "$_zsh_autosuggestions_script"
     _zsh_autosuggest_bind_widgets
   fi
 fi
+
+_nvm_load() {
+  unset -f nvm node npm npx
+
+  local nvm_script
+  for nvm_script in \
+    "$NVM_DIR/nvm.sh" \
+    "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" \
+    "/opt/homebrew/opt/nvm/nvm.sh" \
+    "/usr/local/opt/nvm/nvm.sh"
+  do
+    if [[ -s "$nvm_script" ]]; then
+      . "$nvm_script"
+      return 0
+    fi
+  done
+
+  return 0
+}
+
+nvm() {
+  _nvm_load
+  if ! typeset -f nvm >/dev/null 2>&1; then
+    echo "Error: nvm is not installed." >&2
+    return 1
+  fi
+  nvm "$@"
+}
+
+node() {
+  _nvm_load
+  command node "$@"
+}
+
+npm() {
+  _nvm_load
+  command npm "$@"
+}
+
+npx() {
+  _nvm_load
+  command npx "$@"
+}
 
 if command -v zoxide >/dev/null 2>&1; then
   if typeset -f zsh-defer >/dev/null 2>&1; then
