@@ -94,7 +94,18 @@ export VISUAL="nvim"
 
 PROMPT='%B%F{green}%n@%m%f%b:%B%F{blue}%~%f%b %(!.#.$) '
 
+# eza/exa colors: bright directories, green executables, muted metadata.
+export EZA_COLORS="di=1;38;5;33:ex=1;38;5;40:ln=38;5;51:or=1;38;5;196:pi=38;5;220:so=38;5;213:bd=38;5;214:cd=38;5;214:su=1;38;5;196:sg=1;38;5;203:tw=1;38;5;33:ow=1;38;5;33:st=1;38;5;33:da=38;5;245:sn=38;5;245:sb=38;5;245"
+export EXA_COLORS="$EZA_COLORS"
+
 alias reload='source ~/.zshrc'
+
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --color=auto --group-directories-first'
+  alias ll='eza -l --group-directories-first'
+  alias la='eza -la --group-directories-first'
+  alias lt='eza -T --group-directories-first'
+fi
 
 # git
 alias g='git'
