@@ -46,6 +46,7 @@ alias gc='git commit'
 alias brd='bun run dev'
 alias brb='bun run build'
 alias bu='bun update'
+alias bi='bun install'
 
 # docker
 alias dsp='docker system prune -a -f'
